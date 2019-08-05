@@ -1,0 +1,51 @@
+# VSCode
+.vscode
+
+currency-spotter/.classpath
+currency-spotter/.project
+currency-spotter/.settings
+currency-spotter/target
+
+operation/.idea
+
+ui/.classpath
+ui/.project
+ui/.settings
+ui/target
+ui/src/main/webapp/node/node_modules
+
+wallet/project.lock.json
+wallet/*.pyc
+wallet/nupkg/
+
+# Visual Studio Code
+wallet/.vscode
+
+# Rider
+wallet/.idea
+
+# User-specific files
+wallet/*.suo
+wallet/*.user
+wallet/*.userosscache
+wallet/*.sln.docstates
+
+# Build results
+wallet/[Dd]ebug/
+wallet/[Dd]ebugPublic/
+wallet/[Rr]elease/
+wallet/[Rr]eleases/
+wallet/x64/
+wallet/x86/
+wallet/build/
+wallet/bld/
+wallet/[Bb]in/
+wallet/[Oo]bj/
+wallet/[Oo]ut/
+wallet/msbuild.log
+wallet/msbuild.err
+wallet/msbuild.wrn
+
+# Visual Studio 2015
+wallet/.vs/
+

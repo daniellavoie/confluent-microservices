@@ -1,0 +1,27 @@
+
+<div *ngIf="wallet">
+  <div class="text-center">
+    <button class="btn btn-primary" (click)="depositFunds()">Deposit funds</button>
+    &nbsp;
+    <button class="btn btn-primary" (click)="withdrawFunds()">Withdraw funds</button>
+  </div>
+
+  <table class="table">
+    <thead>
+      <th>Currency</th>
+      <th>Balance</th>
+      <th>&nbsp;</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let entry of wallet.entries">
+        <td>{{entry.currency}}</td>
+        <td>{{entry.balance}}</td>
+        <td><button class="btn btn-primary" (click)="showOperations(entry.currency)">show operations</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+  
+<p *ngIf="!wallet">
+  Loading wallet
+</p>

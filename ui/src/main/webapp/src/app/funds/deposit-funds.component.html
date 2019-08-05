@@ -1,0 +1,19 @@
+<p *ngIf="error">
+  Error! <button (click)="dismissErrors()" >OK</button>
+</p>
+
+<div>
+  Currency: <input type="text" [(ngModel)]="fundsRequest.currency" />
+</div>
+
+<div>
+  Amount: <input type="number" [(ngModel)]="fundsRequest.amount" />
+</div>
+
+<div>
+  Credit Card number: <input type="text" [(ngModel)]="fundsRequest.creditCardNumber" />
+</div>
+
+<div>
+  <button class="btn btn-primary" (click)="depositFunds()">Deposit funds</button>
+</div>

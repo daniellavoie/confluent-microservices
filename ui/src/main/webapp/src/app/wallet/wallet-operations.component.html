@@ -1,0 +1,26 @@
+<div *ngIf="wallet">
+  <table class="table">
+    <thead>
+      <th>Description</th>
+      <th>Debit Amount</th>
+      <th>Credit Amount</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let operation of operations">
+        <td>{{operation.type}}</td>
+        <td>
+          <span *ngIf="currency == operation.debitCurrency">{{operation.debitAmount}}</span>
+          <span *ngIf="currency != operation.debitCurrency">&nbsp;</span>
+        </td>
+        <td>
+          <span *ngIf="currency == operation.creditCurrency">{{operation.creditAmount}}</span>
+          <span *ngIf="currency != operation.creditCurrency">&nbsp;</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+  
+<p *ngIf="!wallet">
+  Loading wallet
+</p>

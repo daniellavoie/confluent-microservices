@@ -1,0 +1,16 @@
+<div *ngIf="walletNotFound">
+  Wallet not found! <button (click)="dismissErrors()" >OK</button>
+</div>
+
+<p>
+  Enter your account number :
+  <input [(ngModel)]="account" type="text" />
+  &nbsp;
+  <button 
+    type="submit" 
+    class="btn btn-primary" 
+    (click)="getWallet()"
+  >
+    GO
+  </button>
+</p>
