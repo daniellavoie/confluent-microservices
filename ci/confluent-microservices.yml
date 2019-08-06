@@ -91,7 +91,7 @@ jobs:
     params:
       build: build 
 
-- name: Build Front
+- name: Build Frontend
   plan:
   - get: ui-src
     trigger: true
