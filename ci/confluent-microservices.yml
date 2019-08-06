@@ -20,6 +20,13 @@ resources:
     access_token: ((github.access-token))
     paths: 
     - operation
+- name: wallet-src
+  type: pull-request
+  source:
+    repository: ((github.repository))
+    access_token: ((github.access-token))
+    paths: 
+    - wallet
 - name: ui-src
   type: pull-request
   source:
@@ -49,6 +56,13 @@ resources:
     username: ((docker.registry.username))
     password: ((docker.registry.password))
 
+- name: docker-image-wallet
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-wallet))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
 - name: docker-image-ui
   type: docker-image
   source:
@@ -56,7 +70,7 @@ resources:
     username: ((docker.registry.username))
     password: ((docker.registry.password))
     
-jobs:           
+jobs:     
 - name: Build Spotter Service
   plan:
   - get: spotter-src
@@ -72,7 +86,14 @@ jobs:
       BUILD_PATH: currency-spotter
   - put: docker-image-spotter
     params:
-      build: build 
+      build: build
+
+- name: Spotter Service Integration Tests
+  plan:
+  - get: docker-image-spotter
+    passed: ["Build Spotter Service"]
+    trigger: true
+  - get: src-ci
 
 - name: Build Operation Service
   plan:
@@ -89,7 +110,31 @@ jobs:
       BUILD_PATH: operation
   - put: docker-image-operation
     params:
-      build: build 
+      build: build
+
+- name: Operation Service Integration Tests
+  plan:
+  - get: docker-image-operation
+    passed: ["Build Operation Service"]
+    trigger: true
+  - get: src-ci
+
+- name: Build Wallet Service
+  plan:
+  - get: wallet-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - put: docker-image-wallet
+    params:
+      build: wallet-src/wallet
+
+- name: Wallet Service Integration Tests
+  plan:
+  - get: docker-image-wallet
+    passed: ["Build Wallet Service"]
+    trigger: true
+  - get: src-ci
 
 - name: Build Frontend
   plan:
@@ -107,3 +152,35 @@ jobs:
   - put: docker-image-ui
     params:
       build: build
+
+- name: Deploy Environment with Docker Compose
+  plan:
+  - get: src-ci
+  - get: docker-image-wallet
+    passed: ["Wallet Service Integration Tests"]
+    trigger: true
+  - get: docker-image-operation
+    passed: ["Operation Service Integration Tests"]
+    trigger: true
+  - get: docker-image-spotter
+    passed: ["Spotter Service Integration Tests"]
+    trigger: true
+  - get: docker-image-ui
+    passed: ["Build Frontend"]
+    trigger: true
+
+- name: Run Acceptance Tests
+  plan:
+  - get: src-ci
+  - get: docker-image-wallet
+    passed: ["Deploy Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-operation
+    passed: ["Deploy Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-spotter
+    passed: ["Deploy Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-ui
+    passed: ["Deploy Environment with Docker Compose"]
+    trigger: true

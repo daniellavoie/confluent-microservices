@@ -10,11 +10,13 @@ import { AccountComponent } from './account/account.component';
 import { DepositFundsComponent } from './funds/deposit-funds.component';
 import { WithdrawFundsComponent } from './funds/withdraw-funds.component';
 import { WalletOperationsComponent } from './wallet/wallet-operations.components';
+import { CurrencyExchangeComponent } from './wallet/currency-exchange.component';
 
 @NgModule({
   declarations: [
     AccountComponent,
     AppComponent,
+    CurrencyExchangeComponent,
     DepositFundsComponent,
     WalletComponent,
     WalletOperationsComponent,

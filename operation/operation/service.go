@@ -76,7 +76,7 @@ func (service *Service) validateOperation(operation *Operation) error {
 	}
 
 	if totalFunds < operation.DebitAmount {
-		errors.New("not enough funds")
+		return errors.New("not enough funds")
 	}
 
 	return nil

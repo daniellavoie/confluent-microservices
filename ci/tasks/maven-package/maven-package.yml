@@ -10,7 +10,7 @@ image_resource:
 inputs:
 - name: src
 - name: src-ci
-
+ 
 outputs:
 - name: build
 - name: version

@@ -1,0 +1,85 @@
+version : '2'
+
+services:
+  operation:
+    image: daniellavoie/confluent-microservices-operation:${OPERATION_VERSION}
+    restart: always
+    mem_limit: 1g
+    networks:
+    - traefik
+    - default
+    labels:
+    - "traefik.backend=operation.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:operation.confluent.daniellavoie.dev"
+    - "traefik.port=8080"
+    - "traefik.docker.network=traefik_webgateway"
+    environment:
+      OPERATION_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  spotter:
+    image: daniellavoie/confluent-microservices-spotter:${SPOTTER_VERSION}
+    restart: always
+    mem_limit: 1g
+    networks:
+    - traefik
+    - default
+    labels:
+    - "traefik.backend=spotter.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:spotter.confluent.daniellavoie.dev"
+    - "traefik.port=8080"
+    - "traefik.docker.network=traefik_webgateway"
+    environment:
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka
+
+  wallet:
+    image: daniellavoie/confluent-microservices-wallet:${WALLET_VERSION}
+    restart: always
+    mem_limit: 1g
+    networks:
+    - traefik
+    - default
+    labels:
+    - "traefik.backend=wallet.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:wallet.confluent.daniellavoie.dev"
+    - "traefik.port=8080"
+    - "traefik.docker.network=traefik_webgateway"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  ui:
+    image: daniellavoie/confluent-microservices-ui:${UI_VERSION}
+    restart: always
+    mem_limit: 1g
+    depends_on:
+    - kafka
+    networks:
+    - traefik
+    - default
+    labels:
+    - "traefik.backend=crypto.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:crypto.confluent.daniellavoie.dev"
+    - "traefik.port=8080"
+    - "traefik.docker.network=traefik_webgateway"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+    - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+networks:
+  traefik:
+    external:
+      name: traefik_webgateway

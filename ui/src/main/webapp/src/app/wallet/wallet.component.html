@@ -11,12 +11,14 @@
       <th>Currency</th>
       <th>Balance</th>
       <th>&nbsp;</th>
+      <th>&nbsp;</th>
     </thead>
     <tbody>
       <tr *ngFor="let entry of wallet.entries">
         <td>{{entry.currency}}</td>
         <td>{{entry.balance}}</td>
-        <td><button class="btn btn-primary" (click)="showOperations(entry.currency)">show operations</button></td>
+        <td><button class="btn btn-primary" (click)="showOperations(entry.currency)">Show operations</button></td>
+        <td><button class="btn btn-primary" (click)="trade(entry.currency)">Trade</button></td>
       </tr>
     </tbody>
   </table>

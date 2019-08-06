@@ -11,8 +11,8 @@ import (
 )
 
 type Service struct {
-	operationService  *operation.Service
-	rates             map[string]*rate.Rate
+	operationService *operation.Service
+	rates            map[string]*rate.Rate
 }
 
 func buildRateIdentifier(baseCurrency string, quoteCurrency string) string {
@@ -25,6 +25,10 @@ func NewService(operationService *operation.Service) *Service {
 
 func (service *Service) getRate(baseCurrency string, quoteCurrency string) (*rate.Rate, error) {
 	rate := service.rates[buildRateIdentifier(baseCurrency, quoteCurrency)]
+
+	if rate == nil {
+		rate = service.rates[buildRateIdentifier(quoteCurrency, baseCurrency)]
+	}
 
 	if rate == nil {
 		return nil, errors.New(fmt.Sprintf("rate %s/%s could not be found", baseCurrency, quoteCurrency))
@@ -56,7 +60,14 @@ func (service *Service) ProcessRequest(request *Request) error {
 		return err
 	}
 
-	exchangeOperation := operation.NewExchangeOperation(request.Account, request.Amount, request.BaseCurrency, rate.Ask*request.Amount, request.ExchangeCurrency)
+	var amount float64
+	if rate.BaseCurrency == request.BaseCurrency {
+		amount = request.Amount * rate.Ask
+	} else {
+		amount = request.Amount / rate.Bid
+	}
+
+	exchangeOperation := operation.NewExchangeOperation(request.Account, amount, request.ExchangeCurrency, request.Amount, request.BaseCurrency)
 
 	return service.operationService.SubmitOperation(exchangeOperation)
 }

@@ -1,0 +1,25 @@
+<h3>Balance : {{balance}} {{exchangeRequest.baseCurrency}}</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Quote Currency</th>
+      <th>Rate</th>
+      <th>{{exchangeRequest.baseCurrency}} amount</th>
+      <th>Quote currency amount</th>
+      <th>&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let entry of exchangeRates | keyvalue">
+      <td>{{entry.key}}</td>
+      <td>{{entry.value.ask | number: '1.5-5'}}</td>
+      <td>
+        <input *ngIf="entry.value.quoteCurrency == entry.key" type="number" [(ngModel)]="amounts[entry.key]" [max]="balance / entry.value.ask" />
+        <input *ngIf="entry.value.baseCurrency == entry.key" type="number" [(ngModel)]="amounts[entry.key]" [max]="balance * entry.value.bid" />
+      </td>
+      <td *ngIf="entry.value.quoteCurrency == entry.key">{{amounts[entry.key] * entry.value.ask | number: '1.5-5'}}</td>
+      <td *ngIf="entry.value.baseCurrency == entry.key">{{amounts[entry.key] / entry.value.ask | number: '1.5-5'}}</td>
+      <td><button class="btn btn-primary" (click)="exchange(entry.key)">Exchange</button></td>
+    </tr>
+  </tbody>
+</table>
