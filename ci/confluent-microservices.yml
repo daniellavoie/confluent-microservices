@@ -11,25 +11,99 @@ resources:
   source:
     repository: ((github.repository))
     access_token: ((github.access-token))
-    
+    paths: 
+    - currency-spotter
+- name: operation-src
+  type: pull-request
+  source:
+    repository: ((github.repository))
+    access_token: ((github.access-token))
+    paths: 
+    - operation
+- name: ui-src
+  type: pull-request
+  source:
+    repository: ((github.repository))
+    access_token: ((github.access-token))
+    paths: 
+    - ui
+
+- name: src-ci
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+
 - name: docker-image-spotter
   type: docker-image
   source:
-    repository: ((docker.registry.repository))
+    repository: ((docker.registry.repository-spotter))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: docker-image-operation
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-operation))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: docker-image-ui
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-ui))
     username: ((docker.registry.username))
     password: ((docker.registry.password))
     
 jobs:           
-- name: Build Spotter
+- name: Build Spotter Service
   plan:
   - get: spotter-src
     trigger: true
     version: every
+  - get: src-ci
   - task: "Build Spotter with Maven"
     file: src-ci/ci/tasks/maven-package/maven-package.yml
     input_mapping:
       src: spotter-src
       src-ci: src-ci
+    params:
+      BUILD_PATH: currency-spotter
   - put: docker-image-spotter
+    params:
+      build: build 
+
+- name: Build Operation Service
+  plan:
+  - get: operation-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - task: "Build Operation with Golang"
+    file: src-ci/ci/tasks/kafka-go-build/kafka-go-build.yml
+    input_mapping:
+      src: operation-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: operation
+  - put: docker-image-operation
+    params:
+      build: build 
+
+- name: Build Front
+  plan:
+  - get: ui-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - task: "Build UI with Maven and NPM"
+    file: src-ci/ci/tasks/maven-package/maven-package.yml
+    input_mapping:
+      src: ui-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: ui
+  - put: docker-image-ui
     params:
       build: build

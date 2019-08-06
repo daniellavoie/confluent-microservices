@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM ubuntu
 
 MAINTAINER Daniel Lavoie <dlavoie@live.ca>
 
