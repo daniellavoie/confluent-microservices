@@ -41,6 +41,10 @@ export class WalletComponent implements OnInit {
     this.router.navigate(["wallet", this.wallet.account, currency]);
   }
 
+  public trade(currency: string){
+    this.router.navigate(["wallet", this.wallet.account, currency, "exchange"]);
+  }
+
   public withdrawFunds(){
     this.router.navigate(["wallet", this.wallet.account,"funds", "withdraw"]);
   }

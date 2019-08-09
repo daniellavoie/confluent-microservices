@@ -12,9 +12,9 @@ import { Operation } from './operation';
   styleUrls: ['./wallet-operations.component.scss']
 })
 export class WalletOperationsComponent implements OnInit {
-  private wallet: Wallet;
-  private currency: string;
-  private operations: Operation[];
+  public wallet: Wallet;
+  public currency: string;
+  public operations: Operation[];
 
   constructor(
     private operationService: OperationService,

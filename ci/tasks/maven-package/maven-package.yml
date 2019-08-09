@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 11-jdk
+
+inputs:
+- name: src
+- name: src-ci
+ 
+outputs:
+- name: build
+- name: version
+
+params:
+  BUILD_PATH:
+
+run:
+  path: src-ci/ci/tasks/maven-package/maven-package.sh
