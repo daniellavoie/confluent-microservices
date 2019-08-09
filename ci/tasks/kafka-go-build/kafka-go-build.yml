@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: daniellavoie/go-build
+    tag: 1.12.7-kafka
+
+inputs:
+- name: src
+- name: src-ci
+
+outputs:
+- name: build
+- name: version
+
+params:
+  BUILD_PATH:
+
+run:
+  path: src-ci/ci/tasks/kafka-go-build/kafka-go-build.sh
