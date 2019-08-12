@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 SRC_FOLDER=src
 BUILD_FOLDER=build
 VERSION_FOLDER=version
