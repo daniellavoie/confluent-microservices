@@ -20,9 +20,9 @@ The Currency Spotter service includes unit tests. They can be exectuted by follo
 
 ## Integration Testing
 
+Integration is an end to end state of a service with its coupled dependencies. In the context of an Event Driven Microservice architecture decoupled, this stops at Kafka. As such, integration tests only needs to validate the messages sent my the targeted service. 
 
-
-Integration testing represents the 
+More specifically, the following characteristics applies to the tests:
 
 * Publishes message to Kafka with Schema Registry validation
 * Requires a predictive data set.

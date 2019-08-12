@@ -35,3 +35,7 @@ $ ./mvnw clean package
 ```
 $ java -jar target/currency-spotter.jar
 ```
+
+### Run Integration Tests
+
+See the [Currency Spotter Integration Tests](../integration-tests/currency-spotter-it/README.md) on how to run integration tests.

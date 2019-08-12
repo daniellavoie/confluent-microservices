@@ -6,7 +6,6 @@ resource_types:
     repository: teliaoss/github-pr-resource
 
 resources:
-
 - name: spotter-src
   type: pull-request
   source:
@@ -14,6 +13,7 @@ resources:
     access_token: ((github.access-token))
     paths: 
     - currency-spotter
+    - integration-tests/currency-spotter-it
 
 - name: operation-src
   type: pull-request
@@ -171,7 +171,7 @@ jobs:
     input_mapping:
       src: spotter-src
     params:
-      BUILD_PATH: acceptance-tests/currency-spotter-at
+      BUILD_PATH: integration-tests/currency-spotter-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/spotter-it
   - put: spotter-src
     params:
