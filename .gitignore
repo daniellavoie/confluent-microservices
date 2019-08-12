@@ -49,3 +49,7 @@ wallet/msbuild.wrn
 # Visual Studio 2015
 wallet/.vs/
 
+acceptance-tests/currency-spotter-at/.settings
+acceptance-tests/currency-spotter-at/.classpath
+acceptance-tests/currency-spotter-at/.project
+acceptance-tests/currency-spotter-at/target

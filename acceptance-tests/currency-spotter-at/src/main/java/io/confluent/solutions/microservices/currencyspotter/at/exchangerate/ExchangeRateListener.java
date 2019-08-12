@@ -1,0 +1,22 @@
+package io.confluent.solutions.microservices.currencyspotter.at.exchangerate;
+
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.stereotype.Component;
+
+import reactor.core.publisher.FluxSink;
+
+@Component
+public class ExchangeRateListener {
+	private FluxSink<ExchangeRate> sink;
+
+	@StreamListener(ExchangeRateSink.CHANNEL)
+	public void handle(ExchangeRate exchangeRate) {
+		if (sink != null) {
+			sink.next(exchangeRate);
+		}
+	}
+
+	public void setSink(FluxSink<ExchangeRate> sink) {
+		this.sink = sink;
+	}
+}

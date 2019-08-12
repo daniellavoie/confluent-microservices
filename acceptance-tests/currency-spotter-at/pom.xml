@@ -5,10 +5,12 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.2.0.M4</version>
   </parent>
+  
   <groupId>io.confluent.solutions.microservices</groupId>
-  <artifactId>currency-spotter</artifactId>
+  <artifactId>currency-spotter-at</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Currency Spotter</name>
+  
+  <name>Currency Spotter Acceptance Tests</name>
   
   <repositories>
     <repository>
@@ -21,34 +23,8 @@
     <java.version>11</java.version>
   </properties>
   
-  <build>
-    <finalName>currency-spotter</finalName>
-    
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>2.1.6.RELEASE</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-  
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webflux</artifactId>
-        <version>5.2.0.M1</version>
-      </dependency>
       <dependency>
           <groupId>org.springframework.cloud</groupId>
           <artifactId>spring-cloud-stream-dependencies</artifactId>
@@ -58,23 +34,12 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webflux</artifactId>
+      <artifactId>spring-boot-starter-json</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-websocket</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-stream-binder-kafka</artifactId>
@@ -85,13 +50,6 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-
-<!-- 	<dependency> -->
-<!-- 	  <groupId>org.springframework.cloud</groupId> -->
-<!-- 	  <artifactId>spring-cloud-stream-test-support</artifactId> -->
-<!-- 	  <scope>test</scope> -->
-<!-- 	</dependency> -->
-    
     <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-test</artifactId>
