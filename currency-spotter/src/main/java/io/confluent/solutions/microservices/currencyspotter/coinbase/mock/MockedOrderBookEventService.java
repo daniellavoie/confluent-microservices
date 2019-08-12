@@ -3,6 +3,7 @@ package io.confluent.solutions.microservices.currencyspotter.coinbase.mock;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,15 +17,24 @@ import io.confluent.solutions.microservices.currencyspotter.coinbase.model.Produ
 import reactor.core.publisher.Flux;
 
 public class MockedOrderBookEventService implements OrderBookEventService {
+	private final boolean repeat;
+
 	private List<OrderBookEvent> events;
 
-	public MockedOrderBookEventService() throws IOException {
+	public MockedOrderBookEventService(boolean repeat) throws IOException {
 		this.events = loadEvents();
+		this.repeat = repeat;
 	}
 
 	@Override
 	public Flux<OrderBookEvent> getEvents(ProductId[] productsIds) {
-		return Flux.fromIterable(events);
+		Flux<OrderBookEvent> flux = Flux.fromIterable(events);
+
+		if (repeat) {
+			flux = flux.delayElements(Duration.ofMillis(100)).repeat();
+		}
+
+		return flux;
 	}
 
 	private List<OrderBookEvent> loadEvents() throws IOException {

@@ -13,7 +13,6 @@ inputs:
 
 outputs:
 - name: build
-- name: version
 
 params:
   BUILD_PATH:

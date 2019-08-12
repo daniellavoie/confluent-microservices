@@ -9,8 +9,8 @@ services:
     - traefik
     - default
     labels:
-    - "traefik.backend=operation.confluent.daniellavoie.dev"
-    - "traefik.frontend.rule=Host:operation.confluent.daniellavoie.dev"
+    - "traefik.backend=dev.operation.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:dev.operation.confluent.daniellavoie.dev"
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
     environment:
@@ -24,8 +24,8 @@ services:
     - traefik
     - default
     labels:
-    - "traefik.backend=spotter.confluent.daniellavoie.dev"
-    - "traefik.frontend.rule=Host:spotter.confluent.daniellavoie.dev"
+    - "traefik.backend=dev.spotter.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:dev.spotter.confluent.daniellavoie.dev"
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
     environment:
@@ -39,8 +39,8 @@ services:
     - traefik
     - default
     labels:
-    - "traefik.backend=wallet.confluent.daniellavoie.dev"
-    - "traefik.frontend.rule=Host:wallet.confluent.daniellavoie.dev"
+    - "traefik.backend=dev.wallet.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:dev.wallet.confluent.daniellavoie.dev"
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
     environment:
@@ -56,8 +56,8 @@ services:
     - traefik
     - default
     labels:
-    - "traefik.backend=crypto.confluent.daniellavoie.dev"
-    - "traefik.frontend.rule=Host:crypto.confluent.daniellavoie.dev"
+    - "traefik.backend=dev.crypto.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:dev.crypto.confluent.daniellavoie.dev"
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
 

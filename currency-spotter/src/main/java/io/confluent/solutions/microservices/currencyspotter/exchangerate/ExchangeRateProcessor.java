@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -24,26 +26,36 @@ import reactor.core.publisher.FluxSink;
 public class ExchangeRateProcessor implements DisposableBean {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeRateProcessor.class);
 
+	private ExchangeRateSink sink;
+	private OrderBookService orderBookService;
 	private Disposable subscriber;
 
 	private Map<String, FluxSink<ExchangeRate>> subscribers = new ConcurrentHashMap<>();
 
 	public ExchangeRateProcessor(ExchangeRateSink sink, OrderBookService orderBookService) {
-		subscriber = orderBookService.orderBookStream(ProductId.values())
+		this.sink = sink;
+		this.orderBookService = orderBookService;
+	}
 
-				.map(this::mapExchangeRate)
+	@EventListener
+	public void init(ContextRefreshedEvent contextRefreshedEvent) {
+		if (subscriber == null || subscriber.isDisposed()) {
+			subscriber = orderBookService.orderBookStream(ProductId.values())
 
-				.doOnNext(exchangeRate -> subscribers.values().forEach(subscriber -> subscriber.next(exchangeRate)))
+					.map(this::mapExchangeRate)
 
-				.map(this::mapExchangeRate)
+					.doOnNext(exchangeRate -> subscribers.values().forEach(subscriber -> subscriber.next(exchangeRate)))
 
-				.doOnNext(message -> sink.input().send(message))
+					.map(this::mapExchangeRate)
 
-				.doOnError(ex -> LOGGER.error("Error while processing order book events", ex))
+					.doOnNext(message -> sink.output().send(message))
 
-				.retryBackoff(Long.MAX_VALUE, Duration.ofMillis(100), Duration.ofMinutes(1))
+					.doOnError(ex -> LOGGER.error("Error while processing order book events", ex))
 
-				.subscribe();
+					.retryBackoff(Long.MAX_VALUE, Duration.ofMillis(100), Duration.ofMinutes(1))
+
+					.subscribe();
+		}
 	}
 
 	public Flux<ExchangeRate> getExchangeRates() {
@@ -69,7 +81,7 @@ public class ExchangeRateProcessor implements DisposableBean {
 
 	@Override
 	public void destroy() throws Exception {
-		if (!subscriber.isDisposed()) {
+		if (subscriber != null && !subscriber.isDisposed()) {
 			subscriber.dispose();
 		}
 	}

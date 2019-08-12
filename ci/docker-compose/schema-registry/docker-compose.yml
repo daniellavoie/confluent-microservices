@@ -1,0 +1,34 @@
+version: "2"
+services:
+  zookeeper:
+    image: confluent/zookeeper
+    environment:
+      zk_id: "1"
+
+  kafka:
+    image: confluent/kafka
+    depends_on:
+    - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "kafka:2181"
+
+  schema-registry:
+    image: confluent/schema-registry
+    depends_on:
+    - kafka
+    - zookeeper
+    networks:
+    - traefik
+    - default
+    labels:
+    - "traefik.backend=schema-registry.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:schema-registry.confluent.daniellavoie.dev"
+    - "traefik.port=8081"
+    - "traefik.docker.network=traefik_webgateway"
+    environment:
+      SR_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+
+networks:
+  traefik:
+    external:
+      name: traefik_webgateway

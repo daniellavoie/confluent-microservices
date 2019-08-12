@@ -1,0 +1,25 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: springcloudservices/spring-cloud-base
+
+inputs:
+- name: ci
+- name: operation-version
+
+run:
+  path: ci/ci/tasks/deploy/deploy.sh
+
+params:
+  DEPLOYMENT_NAME:
+  DOCKER_HOSTNAME:
+  DOCKER_SSH_USER:
+  DOCKER_SSH_PRIVATE_KEY:
+  DOCKER_COMPOSE_FILE: 
+  REGISTRY_URL:
+  REGISTRY_USERNAME:
+  REGISTRY_PASSWORD:
+  KAFKA_PORT:

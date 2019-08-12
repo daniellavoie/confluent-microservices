@@ -13,6 +13,8 @@ resources:
     access_token: ((github.access-token))
     paths: 
     - currency-spotter
+    - integration-tests/currency-spotter-it
+
 - name: operation-src
   type: pull-request
   source:
@@ -20,6 +22,7 @@ resources:
     access_token: ((github.access-token))
     paths: 
     - operation
+
 - name: wallet-src
   type: pull-request
   source:
@@ -27,6 +30,7 @@ resources:
     access_token: ((github.access-token))
     paths: 
     - wallet
+
 - name: ui-src
   type: pull-request
   source:
@@ -41,6 +45,15 @@ resources:
     uri: ((github.uri))
     branch: master
     private_key: ((github.private-key))
+
+- name: schema-registry-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - ci/docker-compose/schema-registry
 
 - name: docker-image-spotter
   type: docker-image
@@ -69,8 +82,45 @@ resources:
     repository: ((docker.registry.repository-ui))
     username: ((docker.registry.username))
     password: ((docker.registry.password))
-    
-jobs:   
+
+- name: spotter-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/spotter-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: operation-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/operation-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: wallet-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/wallet-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: ui-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/ui-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+jobs:
+
 - name: Build Spotter Service
   plan:
   - get: spotter-src
@@ -82,7 +132,7 @@ jobs:
       status: PENDING
   - get: src-ci
   - task: "Build Spotter with Maven"
-    file: src-ci/ci/tasks/maven-package/maven-package.yml
+    file: src-ci/ci/tasks/maven/maven-package.yml
     input_mapping:
       src: spotter-src
       src-ci: src-ci
@@ -91,6 +141,10 @@ jobs:
   - put: docker-image-spotter
     params:
       build: build
+      tag_file: version/version
+  - put: spotter-version
+    params:
+      file: version/version
   on_failure:
     put: spotter-src
     params:
@@ -100,11 +154,34 @@ jobs:
 - name: Spotter Service Integration Tests
   plan:
   - get: spotter-src
-  - get: src-ci
     passed: ["Build Spotter Service"]
+  - get: spotter-version
+    passed: ["Build Spotter Service"]
+  - get: src-ci
   - get: docker-image-spotter
     passed: ["Build Spotter Service"]
     trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-spotter-it.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: spotter-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/spotter-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 11000
+  - task: "Run Spotter Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: spotter-src
+    params:
+      BUILD_PATH: integration-tests/currency-spotter-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/spotter-it
   - put: spotter-src
     params:
       path: spotter-src
@@ -131,6 +208,10 @@ jobs:
   - put: docker-image-operation
     params:
       build: build
+      tag_file: operation-src/operation/version
+  - put: operation-version
+    params:
+      file: operation-src/operation/version
   on_failure:
     put: operation-src
     params:
@@ -140,11 +221,34 @@ jobs:
 - name: Operation Service Integration Tests
   plan:
   - get: src-ci
+  - get: operation-version
+    passed: ["Build Operation Service"]
   - get: operation-src
     passed: ["Build Operation Service"]
   - get: docker-image-operation
     passed: ["Build Operation Service"]
     trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-operation-it.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: operation-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/operation-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 12000
+  - task: "Run Operation Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: operation-src
+    params:
+      BUILD_PATH: integration-tests/operation-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/operation-it
   - put: operation-src
     params:
       path: operation-src
@@ -152,7 +256,7 @@ jobs:
   on_failure:
     put: operation-src
     params:
-      path: spotter-src
+      path: operation-src
       status: FAILURE
 
 - name: Build Wallet Service
@@ -164,6 +268,10 @@ jobs:
   - put: docker-image-wallet
     params:
       build: wallet-src/wallet
+      tag_file: wallet-src/wallet/version
+  - put: wallet-version
+    params:
+      file: wallet-src/wallet/version
   on_failure:
     put: wallet-src
     params:
@@ -173,11 +281,34 @@ jobs:
 - name: Wallet Service Integration Tests
   plan:
   - get: src-ci
+  - get: wallet-version
+    passed: ["Build Wallet Service"]
   - get: wallet-src
     passed: ["Build Wallet Service"]
   - get: docker-image-wallet
     passed: ["Build Wallet Service"]
     trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-wallet-it.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: wallet-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/wallet-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 13000
+  - task: "Run Wallet Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: wallet-src
+    params:
+      BUILD_PATH: integration-tests/wallet-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
   - put: wallet-src
     params:
       path: wallet-src
@@ -195,7 +326,7 @@ jobs:
     version: every
   - get: src-ci
   - task: "Build UI with Maven and NPM"
-    file: src-ci/ci/tasks/maven-package/maven-package.yml
+    file: src-ci/ci/tasks/maven/maven-package.yml
     input_mapping:
       src: ui-src
       src-ci: src-ci
@@ -204,35 +335,26 @@ jobs:
   - put: docker-image-ui
     params:
       build: build
+      tag_file: version/version
+  - put: ui-version
+    params:
+      file: version/version
 
-- name: Deploy Environment with Docker Compose
+- name: Deploy Schema Registry
   plan:
   - get: src-ci
-  - get: docker-image-wallet
-    passed: ["Wallet Service Integration Tests"]
+  - get: schema-registry-src
     trigger: true
-  - get: docker-image-operation
-    passed: ["Operation Service Integration Tests"]
-    trigger: true
-  - get: docker-image-spotter
-    passed: ["Spotter Service Integration Tests"]
-    trigger: true
-  - get: docker-image-ui
-    passed: ["Build Frontend"]
-    trigger: true
-
-- name: Run Acceptance Tests
-  plan:
-  - get: src-ci
-  - get: docker-image-wallet
-    passed: ["Deploy Environment with Docker Compose"]
-    trigger: true
-  - get: docker-image-operation
-    passed: ["Deploy Environment with Docker Compose"]
-    trigger: true
-  - get: docker-image-spotter
-    passed: ["Deploy Environment with Docker Compose"]
-    trigger: true
-  - get: docker-image-ui
-    passed: ["Deploy Environment with Docker Compose"]
-    trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-schema-registry.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: schema-registry
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/schema-registry/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))

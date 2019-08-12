@@ -10,13 +10,10 @@ image_resource:
 inputs:
 - name: src
 - name: src-ci
- 
-outputs:
-- name: build
-- name: version
 
 params:
   BUILD_PATH:
+  ENVIRONMENT_FILE:
 
 run:
-  path: src-ci/ci/tasks/maven-package/maven-package.sh
+  path: src-ci/ci/tasks/maven/maven-test.sh

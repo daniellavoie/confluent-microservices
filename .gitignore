@@ -49,3 +49,17 @@ wallet/msbuild.wrn
 # Visual Studio 2015
 wallet/.vs/
 
+integration-tests/currency-spotter-it/.settings
+integration-tests/currency-spotter-it/.classpath
+integration-tests/currency-spotter-it/.project
+integration-tests/currency-spotter-it/target
+
+integration-tests/operation-it/.settings
+integration-tests/operation-it/.classpath
+integration-tests/operation-it/.project
+integration-tests/operation-it/target
+
+integration-tests/wallet-it/.settings
+integration-tests/wallet-it/.classpath
+integration-tests/wallet-it/.project
+integration-tests/wallet-it/target
