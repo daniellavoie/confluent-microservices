@@ -1,6 +1,10 @@
 #!/bin/sh
 
+set -x
+
 SRC_FOLDER=src
+
+echo "ENVIRONMENT_FILE: $ENVIRONMENT_FILE"
 
 ROOT_DIR=`pwd`
 

@@ -153,7 +153,7 @@ jobs:
     passed: ["Build Spotter Service"]
     trigger: true
   - task: Docker Compose Deployment
-    file: src-ci/ci/tasks/deploy/deploy-spotter-it.yml
+    file: src-ci/ci/tasks/deploy/deploy.yml
     input_mapping:
       ci: src-ci
     params:
@@ -219,13 +219,34 @@ jobs:
   - get: docker-image-operation
     passed: ["Build Operation Service"]
     trigger: true
+  - put: operation-version
+    params:
+      file: operation-src/version
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: operation-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/spotter-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 12000
+  - task: "Run Operation Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: spotter-src
+    params:
+      BUILD_PATH: integration-tests/operation-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/operation-it
   - put: operation-src
     params:
       path: operation-src
       status: SUCCESS
-  - put: operation-version
-    params:
-      file: operation-src/version
   on_failure:
     put: operation-src
     params:
@@ -261,6 +282,26 @@ jobs:
   - get: docker-image-wallet
     passed: ["Build Wallet Service"]
     trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      DEPLOYMENT_NAME: wallet-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/wallet-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+  - task: "Run Operation Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: spotter-src
+    params:
+      BUILD_PATH: integration-tests/wallet-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
   - put: wallet-src
     params:
       path: wallet-src
@@ -292,9 +333,15 @@ jobs:
     params:
       file: version/version
 
-- name: Deploy Environment with Docker Compose
+- name: Deploy Dev Environment with Docker Compose
   plan:
   - get: src-ci
+  - get: spotter-version
+    passed: ["Spotter Service Integration Tests"]
+  - get: operation-version
+    passed: ["Operation Service Integration Tests"]
+  - get: wallet-version
+    passed: ["Wallet Service Integration Tests"]
   - get: ui-version
     passed: ["Build Frontend"]
   - get: docker-image-wallet
@@ -313,15 +360,36 @@ jobs:
 - name: Run Acceptance Tests
   plan:
   - get: src-ci
+  - get: spotter-version
+    passed: ["Deploy Dev Environment with Docker Compose"]
+  - get: operation-version
+    passed: ["Deploy Dev Environment with Docker Compose"]
+  - get: wallet-version
+    passed: ["Deploy Dev Environment with Docker Compose"]
+  - get: ui-version
+    passed: ["Deploy Dev Environment with Docker Compose"]
   - get: docker-image-wallet
-    passed: ["Deploy Environment with Docker Compose"]
+    passed: ["Deploy Dev Environment with Docker Compose"]
     trigger: true
   - get: docker-image-operation
-    passed: ["Deploy Environment with Docker Compose"]
+    passed: ["Deploy Dev Environment with Docker Compose"]
     trigger: true
   - get: docker-image-spotter
-    passed: ["Deploy Environment with Docker Compose"]
+    passed: ["Deploy Dev Environment with Docker Compose"]
     trigger: true
   - get: docker-image-ui
-    passed: ["Deploy Environment with Docker Compose"]
+    passed: ["Deploy Dev Environment with Docker Compose"]
     trigger: true
+
+- name: Deploy Prod Environment with Docker Compose
+  plan:
+  - get: src-ci
+    passed: ["Run Acceptance Tests"]
+  - get: docker-image-wallet
+    passed: ["Run Acceptance Tests"]
+  - get: docker-image-operation
+    passed: ["Run Acceptance Tests"]
+  - get: docker-image-spotter
+    passed: ["Run Acceptance Tests"]
+  - get: docker-image-ui
+    passed: ["Run Acceptance Tests"]
