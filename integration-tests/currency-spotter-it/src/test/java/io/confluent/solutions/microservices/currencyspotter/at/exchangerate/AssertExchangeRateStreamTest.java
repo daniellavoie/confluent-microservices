@@ -5,7 +5,6 @@ import java.time.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -15,9 +14,6 @@ import reactor.test.StepVerifier;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CurrencySpotterAcceptanceApplication.class)
 public class AssertExchangeRateStreamTest {
-	@Value("${spotter.url}")
-	private String spotterUrl;
-
 	@Autowired
 	private ExchangeRateListener listener;
 
