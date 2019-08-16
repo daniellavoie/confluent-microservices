@@ -106,8 +106,8 @@ resources:
   source:
     bucket: ((s3.bucket))
     versioned_file: versions/ui-version
-    access_key_id: ((access-key-id))
-    secret_access_key: ((secret-access-key))
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
     region_name: ((s3.region-name))
 
 jobs:
