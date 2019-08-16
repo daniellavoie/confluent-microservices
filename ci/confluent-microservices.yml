@@ -106,8 +106,8 @@ resources:
   source:
     bucket: ((s3.bucket))
     versioned_file: versions/ui-version
-    access_key_id: ((access-key-id))
-    secret_access_key: ((secret-access-key))
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
     region_name: ((s3.region-name))
 
 jobs:
@@ -248,7 +248,7 @@ jobs:
   - task: "Run Operation Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
-      src: spotter-src
+      src: operation-src
     params:
       BUILD_PATH: integration-tests/operation-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/operation-it
@@ -259,7 +259,7 @@ jobs:
   on_failure:
     put: operation-src
     params:
-      path: spotter-src
+      path: operation-src
       status: FAILURE
 
 - name: Build Wallet Service
@@ -310,10 +310,11 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-  - task: "Run Operation Integration Tests with Maven"
+      KAFKA_PORT: 13000
+  - task: "Run Wallet Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
-      src: spotter-src
+      src: wallet-src
     params:
       BUILD_PATH: integration-tests/wallet-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
