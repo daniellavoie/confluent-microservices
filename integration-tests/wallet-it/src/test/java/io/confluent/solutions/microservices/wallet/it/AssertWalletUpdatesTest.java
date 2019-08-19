@@ -24,16 +24,20 @@ public class AssertWalletUpdatesTest {
 	private OperationSource source;
 
 	@Test
-	public void test() {
+	public void test() throws InterruptedException {
 		String uuid = UUID.randomUUID().toString();
 		source.output().send(MessageBuilder
 				.withPayload(new Operation(uuid, "deposit", null, null, BigDecimal.valueOf(100000), "USD")).build());
 
 		RestTemplate restTemplate = new RestTemplate();
 
+		Thread.sleep(2000);
+		
 		Wallet wallet = restTemplate.exchange(walletUrl + "/api/wallet/" + uuid, HttpMethod.GET, null, Wallet.class)
 				.getBody();
 
+
+		Assert.assertNotNull(wallet);
 		Assert.assertEquals(
 				BigDecimal.valueOf(100000).doubleValue(), wallet.getEntries().stream()
 						.filter(entry -> entry.getCurrency().equals("USD")).findAny().get().getBalance().doubleValue(),

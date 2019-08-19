@@ -310,7 +310,6 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-      KAFKA_PORT: 13000
   - task: "Run Wallet Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
