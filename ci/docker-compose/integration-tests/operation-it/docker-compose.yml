@@ -5,6 +5,11 @@ services:
     image: daniellavoie/confluent-microservices-operation:${SPOTTER_VERSION}
     restart: always
     mem_limit: 1g
+    labels:
+    - "traefik.backend=it.operation.confluent.daniellavoie.dev"
+    - "traefik.frontend.rule=Host:it.operation.confluent.daniellavoie.dev"
+    - "traefik.port=8080"
+    - "traefik.docker.network=traefik_webgateway"
     environment:
       OPERATION_KAFKA_BOOTSTRAP_SERVERS: kafka
 
