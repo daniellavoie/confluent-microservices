@@ -8,7 +8,7 @@ services:
     labels:
     - "traefik.backend=it.wallet.confluent.daniellavoie.dev"
     - "traefik.frontend.rule=Host:it.wallet.confluent.daniellavoie.dev"
-    - "traefik.port=5000"
+    - "traefik.port=80"
     - "traefik.docker.network=traefik_webgateway"
     environment:
       WALLET_KAFKA_BOOTSTRAP_SERVERS: kafka
