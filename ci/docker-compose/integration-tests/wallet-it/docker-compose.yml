@@ -5,14 +5,7 @@ services:
     image: daniellavoie/confluent-microservices-wallet:${WALLET_VERSION}
     restart: always
     mem_limit: 1g
-    networks:
-    - traefik
-    - default
-    labels:
-    - "traefik.backend=it.wallet.confluent.daniellavoie.dev"
-    - "traefik.frontend.rule=Host:it.wallet.confluent.daniellavoie.dev"
-    - "traefik.port=80"
-    - "traefik.docker.network=traefik_webgateway"
+    label
     environment:
       WALLET_KAFKA_BOOTSTRAP_SERVERS: kafka
 
@@ -35,8 +28,3 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
     - "${KAFKA_PORT}:${KAFKA_PORT}"
-
-networks:
-  traefik:
-    external:
-      name: traefik_webgateway

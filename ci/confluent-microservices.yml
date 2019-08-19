@@ -240,7 +240,7 @@ jobs:
       DOCKER_SERVER: ((docker.server))
       DOCKER_SSH_USER: ((docker.ssh-user))
       DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
-      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/operation-it/docker-compose.yml
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/spotter-it/docker-compose.yml
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
@@ -248,7 +248,7 @@ jobs:
   - task: "Run Operation Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
-      src: operation-src
+      src: spotter-src
     params:
       BUILD_PATH: integration-tests/operation-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/operation-it
@@ -259,7 +259,7 @@ jobs:
   on_failure:
     put: operation-src
     params:
-      path: operation-src
+      path: spotter-src
       status: FAILURE
 
 - name: Build Wallet Service
@@ -310,11 +310,10 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-      KAFKA_PORT: 13000
-  - task: "Run Wallet Integration Tests with Maven"
+  - task: "Run Operation Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
-      src: wallet-src
+      src: spotter-src
     params:
       BUILD_PATH: integration-tests/wallet-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
