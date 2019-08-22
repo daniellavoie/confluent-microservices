@@ -1,7 +1,9 @@
 package io.confluent.solutions.microservices.currencyspotter.exchangerate;
 
 import java.time.Duration;
+import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,10 +75,12 @@ public class ExchangeRateProcessor implements DisposableBean {
 	private ExchangeRate mapExchangeRate(OrderBookNotification orderBookNotification) {
 		String[] currencies = orderBookNotification.getOrderBookEvent().getProductId().name().split("_");
 
-		return new ExchangeRate(Currency.valueOf(currencies[0]), Currency.valueOf(currencies[1]),
+		long timestamp = Optional.ofNullable(orderBookNotification.getOrderBookEvent().getTime())
+				.map(time -> time.toEpochSecond(ZoneOffset.UTC)).orElse(0l);
+
+		return new ExchangeRate(currencies[0], currencies[1], 
 				orderBookNotification.getOrderBook().getAsks().iterator().next().getPrice(),
-				orderBookNotification.getOrderBook().getBids().iterator().next().getPrice(),
-				orderBookNotification.getOrderBookEvent().getTime());
+				orderBookNotification.getOrderBook().getBids().iterator().next().getPrice(), timestamp);
 	}
 
 	@Override

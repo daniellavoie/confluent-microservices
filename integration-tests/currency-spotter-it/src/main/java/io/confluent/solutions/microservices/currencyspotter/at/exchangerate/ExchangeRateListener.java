@@ -3,6 +3,7 @@ package io.confluent.solutions.microservices.currencyspotter.at.exchangerate;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.stereotype.Component;
 
+import io.confluent.solutions.microservices.currencyspotter.exchangerate.ExchangeRate;
 import reactor.core.publisher.FluxSink;
 
 @Component

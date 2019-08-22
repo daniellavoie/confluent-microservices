@@ -33,7 +33,7 @@ $ ./mvnw clean package
 ### Run the executable binary
 
 ```
-$ java -jar target/currency-spotter.jar
+$ java -jar target/currency-spotter.jar --spring.cloud.stream.kafka.binder.producerProperties.schema.registry.url=YOUR-SCHEMA-REGISTRY-URL
 ```
 
 ### Run Integration Tests

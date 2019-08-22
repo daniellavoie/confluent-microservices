@@ -1,3 +1,7 @@
 # Currency Spotter Integration Tests
 
-TODO
+```
+export SPRING_CLOUD_STREAM_KAFKA_BINDER_CONSUMERPROPERTIES_SCHEMA_REGISTRY_URL=YOUR-SCHEMA-REGISTRY-URL
+
+./mvnw clean test
+```
