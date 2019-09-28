@@ -8,10 +8,14 @@ image_resource:
 
 inputs:
 - name: ci
-- name: spotter-version
+- name: deploy
+- name: rate-version
+- name: transaction-version
+- name: wallet-version
+- name: ui-version
 
 run:
-  path: ci/ci/tasks/deploy/deploy.sh
+  path: ci/ci/tasks/deploy/deploy-docker-compose.sh
 
 params:
   DEPLOYMENT_NAME:

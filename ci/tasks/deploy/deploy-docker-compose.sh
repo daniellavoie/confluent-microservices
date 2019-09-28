@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # Resources
 CI=ci
 VERSION_FILE=version/version
@@ -9,11 +11,11 @@ SERVER_DEPLOYMENT_FOLDER=/tmp/$DEPLOYMENT_NAME
 SERVER_DOCKER_COMPOSE_FILE=$SERVER_DEPLOYMENT_FOLDER/docker-compose.yml
 PRIVATE_KEY_FILE=/tmp/privatekey
 
-if [ -f spotter-version/version ]; then
-  SPOTTER_VERSION=`cat spotter-version/spotter-version`
+if [ -f rate-version/version ]; then
+  RATE_VERSION=`cat rate-version/rate-version`
 fi
-if [ -f operation-version/version ]; then
-  OPERATION_VERSION=`cat operation-version/operation-version`
+if [ -f transaction-version/version ]; then
+  TRANSACTION_VERSION=`cat transaction-version/transaction-version`
 fi
 if [ -f wallet-version/version ]; then
   WALLET_VERSION=`cat wallet-version/wallet-version`
@@ -31,8 +33,8 @@ echo "DOCKER_SSH_USER : $DOCKER_SSH_USER"
 echo "REGISTRY_URL : $REGISTRY_URL"
 echo "REGISTRY_USERNAME : $REGISTRY_USERNAME"
 echo "KAFKA_PORT: $KAFKA_PORT"
-echo "SPOTTER_VERSION : $SPOTTER_VERSION"
-echo "OPERATION_VERSION : $OPERATION_VERSION"
+echo "RATE_VERSION : $RATE_VERSION"
+echo "TRANSACTION_VERSION : $TRANSACTION_VERSION"
 echo "WALLET_VERSION : $WALLET_VERSION"
 echo "UI_VERSION : $UI_VERSION"
 
@@ -47,9 +49,9 @@ scp -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_COMPOSE_FILE $DOCKE
 # Login to the registry
 ssh -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_SSH_USER@$DOCKER_SERVER "docker login --username $REGISTRY_USERNAME --password $REGISTRY_PASSWORD $REGISTRY_URL" && \
 # Pull latest version for all container images
-ssh -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_SSH_USER@$DOCKER_SERVER "SPOTTER_VERSION=$SPOTTER_VERSION OPERATION_VERSION=$OPERATION_VERSION WALLET_VERSION=$WALLET_VERSION UI_VERSION=$UI_VERSION KAFKA_PORT=$KAFKA_PORT docker-compose -f $SERVER_DOCKER_COMPOSE_FILE pull" && \
+ssh -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_SSH_USER@$DOCKER_SERVER "RATE_VERSION=$RATE_VERSION TRANSACTION_VERSION=$TRANSACTION_VERSION WALLET_VERSION=$WALLET_VERSION UI_VERSION=$UI_VERSION KAFKA_PORT=$KAFKA_PORT docker-compose -f $SERVER_DOCKER_COMPOSE_FILE pull" && \
 # Run docker-compose up
-ssh -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_SSH_USER@$DOCKER_SERVER "SPOTTER_VERSION=$SPOTTER_VERSION OPERATION_VERSION=$OPERATION_VERSION WALLET_VERSION=$WALLET_VERSION UI_VERSION=$UI_VERSION KAFKA_PORT=$KAFKA_PORT docker-compose -f $SERVER_DOCKER_COMPOSE_FILE up -d"
+ssh -o StrictHostKeyChecking=no -i $PRIVATE_KEY_FILE $DOCKER_SSH_USER@$DOCKER_SERVER "RATE_VERSION=$RATE_VERSION TRANSACTION_VERSION=$TRANSACTION_VERSION WALLET_VERSION=$WALLET_VERSION UI_VERSION=$UI_VERSION KAFKA_PORT=$KAFKA_PORT docker-compose -f $SERVER_DOCKER_COMPOSE_FILE up -d"
 
 EXIT_VAL=$?
 

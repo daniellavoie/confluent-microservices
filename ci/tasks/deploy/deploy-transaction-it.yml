@@ -8,10 +8,11 @@ image_resource:
 
 inputs:
 - name: ci
-- name: schema-registry-src
+- name: deploy
+- name: transaction-version
 
 run:
-  path: ci/ci/tasks/deploy/deploy.sh
+  path: ci/ci/tasks/deploy/deploy-docker-compose.sh
 
 params:
   DEPLOYMENT_NAME:
@@ -22,3 +23,4 @@ params:
   REGISTRY_URL:
   REGISTRY_USERNAME:
   REGISTRY_PASSWORD:
+  KAFKA_PORT:

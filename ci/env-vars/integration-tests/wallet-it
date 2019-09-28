@@ -1,2 +1,2 @@
-export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=docker.cspinformatique.com:13000
+export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=it.confluent.daniellavoie.dev:10002
 export WALLET_URL=https://it.wallet.confluent.daniellavoie.dev

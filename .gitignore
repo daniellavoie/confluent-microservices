@@ -63,3 +63,5 @@ integration-tests/wallet-it/.settings
 integration-tests/wallet-it/.classpath
 integration-tests/wallet-it/.project
 integration-tests/wallet-it/target
+
+acceptance-tests/node_modules

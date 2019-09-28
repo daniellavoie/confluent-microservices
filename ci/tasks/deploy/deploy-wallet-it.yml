@@ -8,10 +8,11 @@ image_resource:
 
 inputs:
 - name: ci
+- name: deploy
 - name: wallet-version
 
 run:
-  path: ci/ci/tasks/deploy/deploy.sh
+  path: ci/ci/tasks/deploy/deploy-docker-compose.sh
 
 params:
   DEPLOYMENT_NAME:

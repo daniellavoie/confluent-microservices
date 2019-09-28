@@ -1,0 +1,380 @@
+---
+resources:
+- name: rate-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - currency-spotter
+    - integration-tests/currency-spotter-it
+
+- name: transaction-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - operation
+
+- name: wallet-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - wallet
+
+- name: ui-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - ui
+
+- name: src-ci
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+
+- name: docker-image-rate
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-rate))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: docker-image-transaction
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-transaction))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: docker-image-wallet
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-wallet))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: docker-image-ui
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-ui))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
+- name: rate-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/rate-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: transaction-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/transaction-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: wallet-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/wallet-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: ui-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/ui-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: src-deploy
+  type: git
+  source:
+    uri: ((deployment.git.uri))
+    branch: master
+    private_key: ((deployment.git.private-key))
+
+jobs:
+
+- name: Build Rate Service
+  plan:
+  - get: rate-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - task: "Build rate with Maven"
+    file: src-ci/ci/tasks/maven/maven-package.yml
+    input_mapping:
+      src: rate-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: currency-spotter
+  - put: docker-image-rate
+    params:
+      build: build
+      tag_file: version/version
+  - put: rate-version
+    params:
+      file: version/version
+
+- name: Rate Service Integration Tests
+  plan:
+  - get: rate-src
+    passed: ["Build Rate Service"]
+  - get: rate-version
+    passed: ["Build Rate Service"]
+  - get: transaction-version
+    passed: ["Build Transaction Service"]
+  - get: wallet-version
+    passed: ["Build Wallet Service"]
+  - get: ui-version
+    passed: ["Build UI Service"]
+  - get: src-ci
+  - get: src-deploy
+  - get: docker-image-rate
+    passed: ["Build Rate Service"]
+    trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-rate-it.yml
+    input_mapping:
+      ci: src-ci
+      deploy: src-deploy
+    params:
+      DEPLOYMENT_NAME: rate-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/rate-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 10001
+  - task: "Run Rate Service Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: rate-src
+      deploy: deploy-src
+    params:
+      BUILD_PATH: integration-tests/currency-spotter-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/rate-it
+
+- name: Build Transaction Service
+  plan:
+  - get: transaction-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - task: "Build transaction with Golang"
+    file: src-ci/ci/tasks/kafka-go-build/kafka-go-build.yml
+    input_mapping:
+      src: transaction-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: operation
+  - put: docker-image-transaction
+    params:
+      build: build
+      tag_file: transaction-src/operation/version
+  - put: transaction-version
+    params:
+      file: transaction-src/operation/version
+
+- name: Transaction Service Integration Tests
+  plan:
+  - get: src-ci
+  - get: src-deploy
+  - get: rate-version
+    passed: ["Build Rate Service"]
+  - get: transaction-version
+    passed: ["Build Transaction Service"]
+  - get: wallet-version
+    passed: ["Build Wallet Service"]
+  - get: ui-version
+    passed: ["Build UI Service"]
+  - get: transaction-src
+    passed: ["Build Transaction Service"]
+  - get: docker-image-transaction
+    passed: ["Build Transaction Service"]
+    trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-transaction-it.yml
+    input_mapping:
+      ci: src-ci
+      deploy: src-deploy
+    params:
+      DEPLOYMENT_NAME: transaction-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/transaction-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 10000
+  - task: "Run Transaction Service Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: transaction-src
+    params:
+      BUILD_PATH: integration-tests/operation-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/transaction-it
+
+- name: Build Wallet Service
+  plan:
+  - get: wallet-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - put: docker-image-wallet
+    params:
+      build: wallet-src/wallet
+      tag_file: wallet-src/wallet/version
+  - put: wallet-version
+    params:
+      file: wallet-src/wallet/version
+
+- name: Wallet Service Integration Tests
+  plan:
+  - get: src-ci
+  - get: src-deploy
+  - get: rate-version
+    passed: ["Build Rate Service"]
+  - get: transaction-version
+    passed: ["Build Transaction Service"]
+  - get: wallet-version
+    passed: ["Build Wallet Service"]
+  - get: ui-version
+    passed: ["Build UI Service"]
+  - get: wallet-src
+    passed: ["Build Wallet Service"]
+  - get: docker-image-wallet
+    passed: ["Build Wallet Service"]
+    trigger: true
+  - task: Docker Compose Deployment
+    file: src-ci/ci/tasks/deploy/deploy-wallet-it.yml
+    input_mapping:
+      ci: src-ci
+      deploy: src-deploy
+    params:
+      DEPLOYMENT_NAME: wallet-it
+      DOCKER_SERVER: ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/wallet-it/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 10002
+  - task: "Run Wallet Integration Tests with Maven"
+    file: src-ci/ci/tasks/maven/maven-test.yml
+    input_mapping:
+      src: wallet-src
+    params:
+      BUILD_PATH: integration-tests/wallet-it
+      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
+
+- name: Build UI Service
+  plan:
+  - get: ui-src
+    trigger: true
+    version: every
+  - get: src-ci
+  - task: "Build UI Service with Maven and NPM"
+    file: src-ci/ci/tasks/maven/maven-package.yml
+    input_mapping:
+      src: ui-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: ui
+  - put: docker-image-ui
+    params:
+      build: build
+      tag_file: version/version
+  - put: ui-version
+    params:
+      file: version/version
+
+- name: Deploy QA Environment with Docker Compose
+  plan:
+  - get: src-ci
+  - get: rate-version
+    passed: ["Rate Service Integration Tests"]
+  - get: transaction-version
+    passed: ["Transaction Service Integration Tests"]
+  - get: wallet-version
+    passed: ["Wallet Service Integration Tests"]
+  - get: ui-version
+    passed: ["Build UI Service"]
+  - get: docker-image-wallet
+    passed: ["Wallet Service Integration Tests"]
+    trigger: true
+  - get: docker-image-transaction
+    passed: ["Transaction Service Integration Tests"]
+    trigger: true
+  - get: docker-image-rate
+    passed: ["Rate Service Integration Tests"]
+    trigger: true
+  - get: docker-image-ui
+    passed: ["Build UI Service"]
+    trigger: true
+  - get: src-deploy
+  - task: "Deploy with docker compose"
+    file: src-ci/ci/tasks/deploy/deploy-docker-compose.yml
+    input_mapping:
+      ci: src-ci
+      deploy: src-deploy
+    params:
+      DEPLOYMENT_NAME: microservices-qa
+      DOCKER_SERVER:  ((docker.server))
+      DOCKER_SSH_USER: ((docker.ssh-user))
+      DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
+      DOCKER_COMPOSE_FILE: deploy/compose/qa/docker-compose.yml
+      REGISTRY_URL: ((docker.registry.url))
+      REGISTRY_USERNAME: ((docker.registry.username))
+      REGISTRY_PASSWORD: ((docker.registry.password))
+      KAFKA_PORT: 9092
+
+- name: Run Acceptance Tests
+  plan:
+  - get: src-ci
+  - get: rate-version
+    passed: ["Deploy QA Environment with Docker Compose"]
+  - get: transaction-version
+    passed: ["Deploy QA Environment with Docker Compose"]
+  - get: wallet-version
+    passed: ["Deploy QA Environment with Docker Compose"]
+  - get: ui-version
+    passed: ["Deploy QA Environment with Docker Compose"]
+  - get: docker-image-wallet
+    passed: ["Deploy QA Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-transaction
+    passed: ["Deploy QA Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-rate
+    passed: ["Deploy QA Environment with Docker Compose"]
+    trigger: true
+  - get: docker-image-ui
+    passed: ["Deploy QA Environment with Docker Compose"]
+    trigger: true

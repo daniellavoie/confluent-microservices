@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: springcloudservices/spring-cloud-base
+
+inputs:
+- name: ci
+
+run:
+  path: ci/ci/tasks/post-deployment/post-deployment.sh
+
+params:
+  TRANSACTION_URL:

@@ -1,0 +1,2 @@
+export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=it.confluent.daniellavoie.dev:10000
+export OPERATION_URL=https://it.transaction.confluent.daniellavoie.dev

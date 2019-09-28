@@ -1,0 +1,20 @@
+{
+  "name": "confluent-microservices-acceptance-tests",
+  "version": "0.0.1",
+  "description": "",
+  "main": "home.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "puppeteer": "^1.9.0"
+  },
+  "jest": {
+    "testMatch": [
+      "**/*.spec.js"
+    ]
+  }
+}

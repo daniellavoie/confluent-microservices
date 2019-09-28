@@ -1,2 +1,0 @@
-export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=docker.cspinformatique.com:12000
-export OPERATION_URL=https://it.operation.confluent.daniellavoie.dev

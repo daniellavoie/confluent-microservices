@@ -1,0 +1,1 @@
+export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=it.confluent.daniellavoie.dev:10001
