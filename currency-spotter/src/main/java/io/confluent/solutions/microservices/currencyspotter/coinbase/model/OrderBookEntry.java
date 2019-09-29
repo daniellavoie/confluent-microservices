@@ -13,7 +13,7 @@ public class OrderBookEntry {
 	@JsonCreator
 	public OrderBookEntry(@JsonProperty("price") BigDecimal price, @JsonProperty("size") BigDecimal size,
 			@JsonProperty("side") Side side) {
-		this.price = price;
+		this.price = price.setScale(8);
 		this.size = size;
 		this.side = side;
 	}

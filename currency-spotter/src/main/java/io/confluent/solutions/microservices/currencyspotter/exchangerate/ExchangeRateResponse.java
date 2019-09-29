@@ -3,40 +3,40 @@ package io.confluent.solutions.microservices.currencyspotter.exchangerate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class ExchangeRate {
-	private Currency baseCurrency;
-	private Currency quoteCurrency;
+public class ExchangeRateResponse {
+	private String baseCurrency;
+	private String quoteCurrency;
 	private BigDecimal ask;
 	private BigDecimal bid;
 	private LocalDateTime timestamp;
 
-	public ExchangeRate() {
+	public ExchangeRateResponse() {
 
 	}
 
-	public ExchangeRate(Currency baseCurrency, Currency quoteCurrency, BigDecimal ask, BigDecimal bid,
+	public ExchangeRateResponse(String baseCurrency, String quoteCurrency, BigDecimal ask, BigDecimal bid,
 			LocalDateTime timestamp) {
-		super();
 		this.baseCurrency = baseCurrency;
 		this.quoteCurrency = quoteCurrency;
 		this.ask = ask;
 		this.bid = bid;
 		this.timestamp = timestamp;
+
 	}
 
-	public Currency getBaseCurrency() {
+	public String getBaseCurrency() {
 		return baseCurrency;
 	}
 
-	public void setBaseCurrency(Currency baseCurrency) {
+	public void setBaseCurrency(String baseCurrency) {
 		this.baseCurrency = baseCurrency;
 	}
 
-	public Currency getQuoteCurrency() {
+	public String getQuoteCurrency() {
 		return quoteCurrency;
 	}
 
-	public void setQuoteCurrency(Currency quoteCurrency) {
+	public void setQuoteCurrency(String quoteCurrency) {
 		this.quoteCurrency = quoteCurrency;
 	}
 

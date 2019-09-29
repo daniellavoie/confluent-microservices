@@ -1,0 +1,29 @@
+version : '2'
+
+services:
+  operation:
+    image: daniellavoie/confluent-microservices-operation:${SPOTTER_VERSION}
+    restart: always
+    mem_limit: 1g
+    environment:
+      OPERATION_KAFKA_BOOTSTRAP_SERVERS: kafka
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+    - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092,INTERNAL://kafka:9092,PUBLIC://docker.cspinformatique.com:${KAFKA_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT,PUBLIC:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+    - "${KAFKA_PORT}:${KAFKA_PORT}"

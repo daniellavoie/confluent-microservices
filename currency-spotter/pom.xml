@@ -15,6 +15,10 @@
       <id>spring-milestones</id>
       <url>https://repo.spring.io/milestone</url>
     </repository>
+    <repository>
+      <id>confluent</id>
+      <url>https://packages.confluent.io/maven/</url>
+    </repository>
   </repositories>
   
   <properties>
@@ -38,6 +42,44 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>1.8.2</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>schema</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}/src/main/resources/avro</sourceDirectory>
+              <outputDirectory>${basedir}/target/generated-sources</outputDirectory>
+
+              <enableDecimalLogicalType>true</enableDecimalLogicalType>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>build-helper-maven-plugin</artifactId>
+         <executions>
+            <execution>
+               <id>test</id>
+               <phase>generate-sources</phase>
+               <goals>
+                  <goal>add-source</goal>
+               </goals>
+               <configuration>
+                  <sources>
+                     <source>${basedir}/target/generated-sources</source>
+                  </sources>
+               </configuration>
+            </execution>
+         </executions>
       </plugin>
     </plugins>
   </build>
@@ -76,6 +118,21 @@
     </dependency>
     
     <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>1.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-avro-serializer</artifactId>
+      <version>5.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-stream-binder-kafka</artifactId>
     </dependency>
@@ -86,11 +143,11 @@
       <scope>test</scope>
     </dependency>
 
-	<dependency>
-	  <groupId>org.springframework.cloud</groupId>
-	  <artifactId>spring-cloud-stream-test-support</artifactId>
-	  <scope>test</scope>
-	</dependency>
+	  <dependency>
+	    <groupId>org.springframework.cloud</groupId>
+	    <artifactId>spring-cloud-stream-test-support</artifactId>
+	    <scope>test</scope>
+	  </dependency>
     
     <dependency>
       <groupId>io.projectreactor</groupId>

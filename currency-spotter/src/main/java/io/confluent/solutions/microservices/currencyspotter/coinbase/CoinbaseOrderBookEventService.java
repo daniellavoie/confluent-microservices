@@ -32,6 +32,8 @@ public class CoinbaseOrderBookEventService implements OrderBookEventService {
 				.execute(URI.create(coinbaseConfiguration.getWebsocketUrl()),
 						new CoinbaseWebSocketHandler(productsIds, sink))
 
+				.doOnError(ex -> LOGGER.error("Error while subscribing to coinbase.", ex))
+
 				.doOnError(sink::error)
 
 				.doOnSubscribe(subscriber -> LOGGER.info("Subscribing to coinbase websocket API."))

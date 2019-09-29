@@ -31,7 +31,7 @@ public class ExchangeRateControllerTest {
 
 				.create(webClient.get().uri("/api/exchange-rate").retrieve()
 
-						.bodyToFlux(ExchangeRate.class).take(10))
+						.bodyToFlux(String.class).take(10))
 
 				// Asserts 10 events were notified.
 				.expectNextCount(10)
