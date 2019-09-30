@@ -2,11 +2,12 @@ version : '2'
 
 services:
   spotter:
-    image: daniellavoie/confluent-microservices-spotter:${SPOTTER_VERSION}
+    image: daniellavoie/confluent-microservices-rate:${SPOTTER_VERSION}
     restart: always
     mem_limit: 1g
     environment:
       SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_PRODUCERPROPERTIES_SCHEMA_REGISTRY_URL: https://schema-registry.confluent.daniellavoie.dev
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
