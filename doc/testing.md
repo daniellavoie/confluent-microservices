@@ -1,8 +1,8 @@
 # Testing
 
 * [Unit Testing](#unit-testing)
-* Integration Testing
-* Acceptance Testing
+* [Integration Testing](#integration-testing)
+* [Acceptance Testing](#acceptance-testing)
 
 ## Unit Testing
 
@@ -16,7 +16,7 @@ Unit test follows the following caracteristics:
 
 ### Example tests
 
-The Currency Spotter service includes unit tests. They can be exectuted by following the [service development instructions](../currency-spotter/README.md#development).
+The Rate Service includes unit tests. They can be exectuted by following the [service development instructions](dev/rate-service.md#build).
 
 ## Integration Testing
 
@@ -29,3 +29,5 @@ More specifically, the following characteristics applies to the tests:
 * Tests needs to be idempotent.
 
 ## Acceptance Testing
+
+Acceptance tests are based on jest and will run a headless chrome instance an crawl our UI Service to interract. They are intented to assert that a features are behaving as expected by business users. These could be used for gating before releasing to production. It's also possible to run these as smoke tests in production to assert if a service should be rollbacked or not.

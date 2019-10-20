@@ -11,12 +11,13 @@
 
 ## Project description
 
-This project is a showcase of how Confluent Platform can help building Event Driven Microservice architectures.
+This project is a showcase of how the Confluent Platform can help building Event Driven Microservice architectures.
 
 Implementing Confluent Platform with microservices help with the following topics:
 
-* Simplified integration between micro services
-* Decoupling between micro services.
+* Simplified integration
+* Complete decoupling
+* Contracts
 
 ## Featured languages
 
@@ -28,9 +29,10 @@ Implementing Confluent Platform with microservices help with the following topic
 ## Featured Confluent Platform components
 
 - [X] Kafka Clients
-- [ ] Schema Registry
+- [X] Schema Registry
 - [ ] Replicator
 - [ ] RBAC
+- [ ] KSQL
 - [ ] Rest Proxy
 - [ ] MQTT Proxy
 
@@ -45,9 +47,11 @@ This project simulates a simple Crypto currency trading platform. Users can crea
 - [X] Withdraw funds to a fake bank account
 - [X] Consult wallets for all currencies
 - [X] Display all operations on every wallet
-- [ ] Exchange currencies
+- [X] Exchange currencies
 
 ## Functional Architecture
+
+![Functional Architecture](doc/architecture.png)
 
 ### Wallet Service - Dotnet core
 
@@ -67,9 +71,11 @@ Allows interraction with all the micro services.
 
 ## Deployment instructions
 
-- [ ] Docker compose
-- [ ] Cloud Foundry
-- [ ] Kubernetes
-- [ ] Ansible
+- [Docker compose](doc/deployment/docker-compose.md)
 
 ## Development instructions
+
+* [Rate Service](doc/dev/rate-service.md)
+* [Transaction Service](doc/dev/transaction-service.md)
+* [Wallet Service](doc/dev/wallet-service.md)
+* [UI Service](doc/dev/ui-service.md)

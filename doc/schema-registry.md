@@ -1,0 +1,5 @@
+```
+curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+  --data '{"schema": "\t{\r\n\t    \"type\": \"record\",\r\n\t    \"name\": \"ExchangeRate\",\r\n\t    \"namespace\": \"io.confluent.solutions.microservices.currencyspotter.exchangerate\",\r\n\t    \"fields\": [\r\n\t    {\r\n\t        \"name\": \"baseCurrency\",\r\n\t        \"type\": \"string\"\r\n\t    },\r\n\t    {\r\n\t        \"name\": \"quoteCurrency\",\r\n\t        \"type\": \"string\"\r\n\t    },\r\n\t    {\r\n\t        \"name\": \"ask\",\r\n\t        \"type\": {\"type\": \"bytes\", \"logicalType\": \"decimal\", \"precision\": 24, \"scale\": 8}\r\n\t    },\r\n\t    {\r\n\t        \"name\": \"bid\",\r\n\t        \"type\": {\"type\": \"bytes\", \"logicalType\": \"decimal\", \"precision\": 24, \"scale\": 8}\r\n\t    },\r\n\t    {\r\n\t        \"name\": \"timestamp\",\r\n\t        \"type\": \"long\",\r\n\t        \"logicalType\": \"timestamp-millis\"\r\n\t    }]\r\n\t}"}' \
+   https://schema-registry.confluent.daniellavoie.dev/subjects/exchange-rate-value/versions
+```

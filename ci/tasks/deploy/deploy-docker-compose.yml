@@ -13,6 +13,7 @@ inputs:
 - name: transaction-version
 - name: wallet-version
 - name: ui-version
+- name: data-faker-version
 
 run:
   path: ci/ci/tasks/deploy/deploy-docker-compose.sh

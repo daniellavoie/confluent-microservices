@@ -37,6 +37,15 @@ resources:
     paths: 
     - ui
 
+- name: data-faker-src
+  type: git
+  source:
+    uri: ((github.uri))
+    branch: master
+    private_key: ((github.private-key))
+    paths: 
+    - data-faker
+
 - name: src-ci
   type: git
   source:
@@ -72,6 +81,13 @@ resources:
     username: ((docker.registry.username))
     password: ((docker.registry.password))
 
+- name: docker-image-data-faker
+  type: docker-image
+  source:
+    repository: ((docker.registry.repository-data-faker))
+    username: ((docker.registry.username))
+    password: ((docker.registry.password))
+
 - name: rate-version
   type: s3
   source:
@@ -104,6 +120,15 @@ resources:
   source:
     bucket: ((s3.bucket))
     versioned_file: versions/ui-version
+    access_key_id: ((s3.access-key-id))
+    secret_access_key: ((s3.secret-access-key))
+    region_name: ((s3.region-name))
+
+- name: data-faker-version
+  type: s3
+  source:
+    bucket: ((s3.bucket))
+    versioned_file: versions/data-faker-version
     access_key_id: ((s3.access-key-id))
     secret_access_key: ((s3.secret-access-key))
     region_name: ((s3.region-name))
@@ -315,6 +340,26 @@ jobs:
     params:
       file: version/version
 
+- name: Build Data Faker
+  plan:
+  - get: data-faker-src
+    trigger: true
+  - get: src-ci
+  - task: "Build Data Faker with Maven"
+    file: src-ci/ci/tasks/maven/maven-package.yml
+    input_mapping:
+      src: data-faker-src
+      src-ci: src-ci
+    params:
+      BUILD_PATH: data-faker
+  - put: docker-image-data-faker
+    params:
+      build: build
+      tag_file: version/version
+  - put: data-faker-version
+    params:
+      file: version/version
+
 - name: Deploy QA Environment with Docker Compose
   plan:
   - get: src-ci
@@ -326,6 +371,8 @@ jobs:
     passed: ["Wallet Service Integration Tests"]
   - get: ui-version
     passed: ["Build UI Service"]
+  - get: data-faker-version
+    passed: ["Build Data Faker"]
   - get: docker-image-wallet
     passed: ["Wallet Service Integration Tests"]
     trigger: true
@@ -337,6 +384,9 @@ jobs:
     trigger: true
   - get: docker-image-ui
     passed: ["Build UI Service"]
+    trigger: true
+  - get: docker-image-data-faker
+    passed: ["Build Data Faker"]
     trigger: true
   - get: src-deploy
   - task: "Deploy with docker compose"

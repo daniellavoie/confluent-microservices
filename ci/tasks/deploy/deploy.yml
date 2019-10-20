@@ -12,6 +12,7 @@ inputs:
 - name: operation-version
 - name: wallet-version
 - name: ui-version
+- name: data-faker-version
 
 run:
   path: ci/ci/tasks/deploy/deploy.sh
