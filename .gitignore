@@ -65,3 +65,5 @@ integration-tests/wallet-it/.project
 integration-tests/wallet-it/target
 
 acceptance-tests/node_modules
+
+.DS_Store

@@ -1,16 +1,9 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
-WORKDIR /app
+FROM openjdk:11
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+MAINTAINER Daniel Lavoie <dlavoie@live.ca>
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+ADD target/wallet.jar /app/wallet.jar
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
-WORKDIR /app
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "wallet.dll"]
+EXPOSE 8080
+
+CMD ["java", "-jar", "/app/wallet.jar"]

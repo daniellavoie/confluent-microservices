@@ -21,9 +21,7 @@ Implementing Confluent Platform with microservices help with the following topic
 
 ## Featured languages
 
-* Java (Spring Boot)
-* C# (Aspnet core)
-* Golang (Gin-Gonic)
+* Java (Kafka Streams with Spring Boot)
 * Typescript (Angular)
 
 ## Featured Confluent Platform components
@@ -53,19 +51,19 @@ This project simulates a simple Crypto currency trading platform. Users can crea
 
 ![Functional Architecture](doc/architecture.png)
 
-### Wallet Service - Dotnet core
+### Wallet Service
 
 Tracks operations from users and compute in real time the balance of all currencies of an account.
 
-### Operation Service - Golang
+### Operation Service
 
 Holds the history of all transaction for all accounts.
 
-### Rate Service (Spotter) - Java
+### Rate Service
 
 Provides real time exchange rates for all currencies.
 
-### Graphical User Interface - Typescript
+### Graphical User Interface
 
 Allows interraction with all the micro services.
 
@@ -78,4 +76,4 @@ Allows interraction with all the micro services.
 * [Rate Service](doc/dev/rate-service.md)
 * [Transaction Service](doc/dev/transaction-service.md)
 * [Wallet Service](doc/dev/wallet-service.md)
-* [UI Service](doc/dev/ui-service.md)
+* UI Service

@@ -1,8 +1,8 @@
 version : '2'
 
 services:
-  operation:
-    image: daniellavoie/confluent-microservices-operation:${TRANSACTION_VERSION}
+  transaction:
+    image: daniellavoie/confluent-microservices-transaction:${TRANSACTION_VERSION}
     restart: always
     mem_limit: 1g
     networks:
@@ -14,27 +14,12 @@ services:
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
     environment:
-      OPERATION_KAFKA_BOOTSTRAP_SERVERS: kafka
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-    - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,PUBLIC://it.confluent.daniellavoie.dev:${KAFKA_PORT}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,PUBLIC:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-    - "${KAFKA_PORT}:${KAFKA_PORT}"
+      SPRING_KAFKA_BOOTSTRAPSERVERS: pkc-419q3.us-east4.gcp.confluent.cloud:9092
+      SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="7B36DZAIK4X7BJ7O" password="hbKv9KUyv1pTHWEhk0jPwK6TX0RzU7+s+aCQcgajTgeKaxrf9Crm/7sb7FFR+iEA";
+      TRANSACTION_TOPICS_EXCHANGERATE_NAME: transaction-it-exchange-rate
+      TRANSACTION_TOPICS_TRANSACTIONFAILED_NAME: transaction-it-transaction-failed
+      TRANSACTION_TOPICS_TRANSACTIONREQUEST_NAME: transaction-it-transaction-request
+      TRANSACTION_TOPICS_TRANSACTIONSUCCESS_NAME: transaction-it-transaction-success
 
 networks:
   traefik:

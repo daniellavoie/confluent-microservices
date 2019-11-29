@@ -1,2 +1,2 @@
-export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=it.confluent.daniellavoie.dev:10000
-export OPERATION_URL=https://it.transaction.confluent.daniellavoie.dev
+export SPRING_KAFKA_BOOTSTRAPSERVERS=pkc-419q3.us-east4.gcp.confluent.cloud:9092
+export SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="7B36DZAIK4X7BJ7O" password="hbKv9KUyv1pTHWEhk0jPwK6TX0RzU7+s+aCQcgajTgeKaxrf9Crm/7sb7FFR+iEA";

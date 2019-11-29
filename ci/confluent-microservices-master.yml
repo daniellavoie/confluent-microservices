@@ -17,7 +17,7 @@ resources:
     branch: master
     private_key: ((github.private-key))
     paths: 
-    - operation
+    - transaction
 
 - name: wallet-src
   type: git
@@ -210,20 +210,20 @@ jobs:
     trigger: true
     version: every
   - get: src-ci
-  - task: "Build transaction with Golang"
-    file: src-ci/ci/tasks/kafka-go-build/kafka-go-build.yml
+  - task: "Build Transaction Service with Maven"
+    file: src-ci/ci/tasks/maven/maven-package.yml
     input_mapping:
       src: transaction-src
       src-ci: src-ci
     params:
-      BUILD_PATH: operation
+      BUILD_PATH: transaction
   - put: docker-image-transaction
     params:
       build: build
-      tag_file: transaction-src/operation/version
+      tag_file: version/version
   - put: transaction-version
     params:
-      file: transaction-src/operation/version
+      file: version/version
 
 - name: Transaction Service Integration Tests
   plan:
@@ -262,7 +262,7 @@ jobs:
     input_mapping:
       src: transaction-src
     params:
-      BUILD_PATH: integration-tests/operation-it
+      BUILD_PATH: integration-tests/transaction-it
       ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/transaction-it
 
 - name: Build Wallet Service
