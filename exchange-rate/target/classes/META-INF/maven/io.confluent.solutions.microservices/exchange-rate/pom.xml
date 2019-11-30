@@ -23,17 +23,7 @@
   
   <build>
     <finalName>exchange-rate</finalName>
-    
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>2.1.6.RELEASE</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    
+ 
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -120,6 +110,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.junit.vintage</groupId>
+          <artifactId>junit-vintage-engine</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
