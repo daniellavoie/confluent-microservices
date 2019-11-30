@@ -1,2 +1,0 @@
-export SPRING_KAFKA_BOOTSTRAPSERVERS=pkc-419q3.us-east4.gcp.confluent.cloud:9092
-export SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="7B36DZAIK4X7BJ7O" password="hbKv9KUyv1pTHWEhk0jPwK6TX0RzU7+s+aCQcgajTgeKaxrf9Crm/7sb7FFR+iEA";

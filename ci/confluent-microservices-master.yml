@@ -7,8 +7,8 @@ resources:
     branch: master
     private_key: ((github.private-key))
     paths: 
-    - currency-spotter
-    - integration-tests/currency-spotter-it
+    - exchange-rate
+    - integration-tests/exchange-rate-it
 
 - name: transaction-src
   type: git
@@ -154,7 +154,7 @@ jobs:
       src: rate-src
       src-ci: src-ci
     params:
-      BUILD_PATH: currency-spotter
+      BUILD_PATH: exchange-rate
   - put: docker-image-rate
     params:
       build: build
@@ -190,19 +190,28 @@ jobs:
       DOCKER_SERVER: ((docker.server))
       DOCKER_SSH_USER: ((docker.ssh-user))
       DOCKER_SSH_PRIVATE_KEY: ((docker.ssh-private-key))
-      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/rate-it/docker-compose.yml
+      DOCKER_COMPOSE_FILE: ci/ci/docker-compose/integration-tests/exchange-rate-it/docker-compose.yml
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
       KAFKA_PORT: 10001
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.key))
   - task: "Run Rate Service Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
       src: rate-src
       deploy: deploy-src
     params:
-      BUILD_PATH: integration-tests/currency-spotter-it
-      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/rate-it
+      BUILD_PATH: integration-tests/exchange-rate-it
+      SPRING_PROFILES_ACTIVE: ccloud
+      COINBASE_MOCK_ENABLED: false
+      CCLOUD_BOOTSTRAPSERVERS: ${CCLOUD_BOOTSTRAP_SERVERS}
+      CCLOUD_API_KEY: ${CCLOUD_API_KEY}
+      CCLOUD_API_SECRET: ${CCLOUD_API_SECRET}
+      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
+      SCHEMA_REGISTRY_KEY: $SCHEMA_REGISTRY_KEY}
+      SCHEMA_REGISTRY_SECRET: ${SCHEMA_REGISTRY_SECRET}
 
 - name: Build Transaction Service
   plan:
@@ -257,13 +266,29 @@ jobs:
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
       KAFKA_PORT: 10000
+      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.key))
+      SCHEMA_REGISTRY_URL: ((schema-registry.url))
+      SCHEMA_REGISTRY_KEY: ((schema-registry.key))
+      SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
   - task: "Run Transaction Service Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
       src: transaction-src
     params:
       BUILD_PATH: integration-tests/transaction-it
-      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/transaction-it
+      SPRING_PROFILES_ACTIVE: ccloud
+      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.key))
+      SCHEMA_REGISTRY_URL: ((schema-registry.url))
+      SCHEMA_REGISTRY_KEY: ((schema-registry.key))
+      SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
+      TRANSACTION_TOPICS_EXCHANGERATE_NAME: it-exchange-rate
+      TRANSACTION_TOPICS_TRANSACTIONFAILED_NAME: transaction-it-transaction-failed
+      TRANSACTION_TOPICS_TRANSACTIONREQUEST_NAME: transaction-it-transaction-request
+      TRANSACTION_TOPICS_TRANSACTIONSUCCESS_NAME: transaction-it-transaction-success
 
 - name: Build Wallet Service
   plan:
@@ -311,13 +336,21 @@ jobs:
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
       KAFKA_PORT: 10002
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.key))
   - task: "Run Wallet Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
       src: wallet-src
     params:
       BUILD_PATH: integration-tests/wallet-it
-      ENVIRONMENT_FILE: src-ci/ci/env-vars/integration-tests/wallet-it
+      SPRING_PROFILES_ACTIVE: ccloud
+      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
+      WALLETIT_TOPICS_ACCOUNT_NAME: wallet-it-account
+      WALLETIT_TOPICS_TRANSACTIONSUCCESS_NAME: wallet-it-transaction-success
+      WALLETIT_TOPICS_WALLET_NAME: wallet-it-wallet
 
 - name: Build UI Service
   plan:

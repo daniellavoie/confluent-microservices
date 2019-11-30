@@ -3,6 +3,7 @@ package io.confluent.solutions.microservices.it;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.kafka.clients.consumer.Consumer;
@@ -20,6 +21,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import io.confluent.solutions.microservices.exchangerate.ExchangeRate;
 import io.confluent.solutions.microservices.transaction.Transaction;
 
 @SpringBootTest
@@ -28,6 +30,16 @@ public class AssertTransactions {
 
 	private Consumer<String, Transaction> successTransaction;
 	private KafkaTemplate<String, Transaction> transactionTemplate;
+	private KafkaTemplate<String, ExchangeRate> exchangeRateTemplate;
+
+	@Autowired
+	private ExchangeRateConfiguration exchangeRateConfiguration;
+
+	@Autowired
+	private TransactionRequestConfiguration transactionRequestConfiguration;
+
+	@Autowired
+	private TransactionSuccessConfiguration transactionSuccessConfiguration;
 
 	@Autowired
 	private KafkaProperties kafkaProperties;
@@ -37,10 +49,18 @@ public class AssertTransactions {
 		successTransaction = new DefaultKafkaConsumerFactory<String, Transaction>(
 				kafkaProperties.buildConsumerProperties()).createConsumer();
 
-		successTransaction.subscribe(Arrays.asList("transaction-success"));
+		successTransaction.subscribe(Arrays.asList(transactionSuccessConfiguration.getName()));
 
 		transactionTemplate = new KafkaTemplate<String, Transaction>(
 				new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties()));
+
+		Map<String, Object> exchangeRateProperties = kafkaProperties.buildProducerProperties();
+
+		exchangeRateProperties.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
+
+		exchangeRateTemplate = new KafkaTemplate<String, ExchangeRate>(
+				new DefaultKafkaProducerFactory<String, ExchangeRate>(exchangeRateProperties));
+
 	}
 
 	@AfterEach
@@ -61,14 +81,18 @@ public class AssertTransactions {
 
 	@Test
 	public void assertExchangeTransaction() {
+		exchangeRateTemplate.send(exchangeRateConfiguration.getName(), "BTC-USD",
+				new ExchangeRate("BTC", "USD", BigDecimal.valueOf(8001d).setScale(8),
+						BigDecimal.valueOf(8000d).setScale(8), System.currentTimeMillis()));
+
 		generateDeposit(1000, "USD");
-		
+
 		Transaction exchangeTransaction = generateExchange(1000d, "USD", "BTC");
 
 		Assertions.assertNotNull(exchangeTransaction.getCreditAmount());
-		
+
 		generateDeposit(2, "BTC");
-		
+
 		exchangeTransaction = generateExchange(1, "BTC", "USD");
 
 		Assertions.assertNotNull(exchangeTransaction.getCreditAmount());
@@ -96,7 +120,8 @@ public class AssertTransactions {
 
 		successTransaction.commitSync();
 
-		transactionTemplate.send("transaction-request", expectedTransaction.getAccount(), expectedTransaction);
+		transactionTemplate.send(transactionRequestConfiguration.getName(), expectedTransaction.getAccount(),
+				expectedTransaction);
 		transactionTemplate.flush();
 
 		ConsumerRecords<String, Transaction> records = successTransaction.poll(Duration.ofSeconds(30));

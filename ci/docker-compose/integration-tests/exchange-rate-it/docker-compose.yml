@@ -1,0 +1,17 @@
+version : '2'
+
+services:
+  spotter:
+    image: daniellavoie/confluent-microservices-rate:${RATE_VERSION}
+    restart: always
+    mem_limit: 1g
+    environment:
+      SPRING_PROFILES_ACTIVE: ccloud
+      COINBASE_MOCK_ENABLED: false
+      CCLOUD_BOOTSTRAPSERVERS: ${CCLOUD_BOOTSTRAP_SERVERS}
+      CCLOUD_API_KEY: ${CCLOUD_API_KEY}
+      CCLOUD_API_SECRET: ${CCLOUD_API_SECRET}
+      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
+      SCHEMA_REGISTRY_KEY: $SCHEMA_REGISTRY_KEY}
+      SCHEMA_REGISTRY_SECRET: ${SCHEMA_REGISTRY_SECRET}
+      SPRING_KAFKA_PROPERTIES_AUTO_REGISTER_SCHEMAS: true

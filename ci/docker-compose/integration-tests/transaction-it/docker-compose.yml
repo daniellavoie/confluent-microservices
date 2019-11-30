@@ -14,12 +14,18 @@ services:
     - "traefik.port=8080"
     - "traefik.docker.network=traefik_webgateway"
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: pkc-419q3.us-east4.gcp.confluent.cloud:9092
-      SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="7B36DZAIK4X7BJ7O" password="hbKv9KUyv1pTHWEhk0jPwK6TX0RzU7+s+aCQcgajTgeKaxrf9Crm/7sb7FFR+iEA";
-      TRANSACTION_TOPICS_EXCHANGERATE_NAME: transaction-it-exchange-rate
+      SPRING_PROFILES_ACTIVE: ccloud
+      CCLOUD_BOOTSTRAPSERVERS: ${CCLOUD_BOOTSTRAP_SERVERS}
+      CCLOUD_API_KEY: ${CCLOUD_API_KEY}
+      CCLOUD_API_SECRET: ${CCLOUD_API_SECRET}
+      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
+      SCHEMA_REGISTRY_KEY: $SCHEMA_REGISTRY_KEY}
+      SCHEMA_REGISTRY_SECRET: ${SCHEMA_REGISTRY_SECRET}
+      TRANSACTION_TOPICS_EXCHANGERATE_NAME: it-exchange-rate
       TRANSACTION_TOPICS_TRANSACTIONFAILED_NAME: transaction-it-transaction-failed
       TRANSACTION_TOPICS_TRANSACTIONREQUEST_NAME: transaction-it-transaction-request
       TRANSACTION_TOPICS_TRANSACTIONSUCCESS_NAME: transaction-it-transaction-success
+      LOGGING_LEVEL_IO_CONFLUENT_SOLUTIONS_MICROSERVICES_TRANSACTION: TRACE
 
 networks:
   traefik:

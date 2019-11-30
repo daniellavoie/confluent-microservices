@@ -26,7 +26,7 @@ public class OperationCreditStream {
 						.filter((account, transaction) -> Transaction.Type.EXCHANGE.equals(transaction.getType())))
 
 				.transformValues(() -> new OperationCreditTransformer(accountCurrencyBalanceStoreName, rateStoreName),
-						accountCurrencyBalanceStoreName, rateStoreName)
+						accountCurrencyBalanceStoreName)
 
 				.peek(OperationCreditStream::traceOperationResult);
 	}

@@ -1,2 +1,0 @@
-export SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=it.confluent.daniellavoie.dev:10001
-export SPRING_CLOUD_STREAM_KAFKA_BINDER_CONSUMERPROPERTIES_SCHEMA_REGISTRY_URL=https://schema-registry.confluent.daniellavoie.dev

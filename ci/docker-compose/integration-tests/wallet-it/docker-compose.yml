@@ -14,27 +14,13 @@ services:
     - "traefik.port=80"
     - "traefik.docker.network=traefik_webgateway"
     environment:
-      WALLET_KAFKA_BOOTSTRAP_SERVERS: kafka
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-    - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,PUBLIC://it.confluent.daniellavoie.dev:${KAFKA_PORT}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,PUBLIC:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-    - "${KAFKA_PORT}:${KAFKA_PORT}"
+      SPRING_PROFILES_ACTIVE: ccloud
+      CCLOUD_BOOTSTRAPSERVERS: ${CCLOUD_BOOTSTRAP_SERVERS}
+      CCLOUD_API_KEY: ${CCLOUD_API_KEY}
+      CCLOUD_API_SECRET: ${CCLOUD_API_SECRET}
+      WALLET_TOPICS_TRANSACTIONSUCCESS_NAME: wallet-it-transaction-success
+      WALLET_TOPICS_WALLET_NAME: wallet-it-wallet
+      WALLET_TOPICS_ACCOUNT_NAME: wallet-it-account
 
 networks:
   traefik:

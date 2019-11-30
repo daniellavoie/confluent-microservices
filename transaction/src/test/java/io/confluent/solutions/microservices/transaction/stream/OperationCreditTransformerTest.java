@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import io.confluent.solutions.microservices.currencyspotter.exchangerate.ExchangeRate;
+import io.confluent.solutions.microservices.exchangerate.ExchangeRate;
 import io.confluent.solutions.microservices.transaction.TransactionApplication;
 import io.confluent.solutions.microservices.transaction.model.AccountCurrency;
 import io.confluent.solutions.microservices.transaction.model.AccountCurrencyBalance;
