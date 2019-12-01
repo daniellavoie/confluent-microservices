@@ -353,7 +353,7 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-      KAFKA_PORT: 10002
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
       CCLOUD_API_SECRET: ((ccloud.api.secret))
   - task: "Run Wallet Integration Tests with Maven"
