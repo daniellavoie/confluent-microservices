@@ -366,9 +366,9 @@ jobs:
       CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
       CCLOUD_API_SECRET: ((ccloud.api.secret))
-      WALLETIT_TOPICS_ACCOUNT_NAME: wallet-it-account
-      WALLETIT_TOPICS_TRANSACTIONSUCCESS_NAME: wallet-it-transaction-success
-      WALLETIT_TOPICS_WALLET_NAME: wallet-it-wallet
+      WALLET_TOPICS_ACCOUNT_NAME: wallet-it-account
+      WALLET_TOPICS_TRANSACTIONSUCCESS_NAME: wallet-it-transaction-success
+      WALLET_TOPICS_WALLET_NAME: wallet-it-wallet
 
 - name: Build UI Service
   plan:
