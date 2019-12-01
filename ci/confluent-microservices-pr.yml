@@ -12,6 +12,9 @@ resources:
     repository: ((github.repository))
     access_token: ((github.access-token))
     paths: 
+    - .mvn
+    - mvnw
+    - mvnw.bat
     - currency-rate
     - integration-tests/currency-rate-it
 
@@ -21,7 +24,11 @@ resources:
     repository: ((github.repository))
     access_token: ((github.access-token))
     paths: 
+    - .mvn
+    - mvnw
+    - mvnw.bat
     - transaction
+    - integration-tests/transaction-it
 
 - name: wallet-src
   type: pull-request
@@ -29,7 +36,11 @@ resources:
     repository: ((github.repository))
     access_token: ((github.access-token))
     paths: 
+    - .mvn
+    - mvnw
+    - mvnw.bat
     - wallet
+    - integration-tests/wallet-it
 
 - name: ui-src
   type: pull-request

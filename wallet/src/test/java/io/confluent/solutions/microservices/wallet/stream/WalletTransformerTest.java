@@ -1,4 +1,4 @@
-package io.confluent.solutions.microservices.wallet;
+package io.confluent.solutions.microservices.wallet.stream;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -10,21 +10,22 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.confluent.solutions.microservices.wallet.model.Transaction;
 import io.confluent.solutions.microservices.wallet.model.Transaction.Type;
 import io.confluent.solutions.microservices.wallet.model.Wallet;
 import io.confluent.solutions.microservices.wallet.model.WalletEntry;
-import io.confluent.solutions.microservices.wallet.stream.TransactionToWalletTransformer;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class WalletTransformerTest {
 	private static final String DEPOSIT_ACCOUNT = "1";
 	private static final String EXCHANGE_ACCOUNT = "2";
 	private static final String WIDTHDRAW_ACCOUNT = "3";
+
 	@Mock
 	private KeyValueStore<String, Wallet> walletStore;
 
@@ -33,11 +34,6 @@ public class WalletTransformerTest {
 	@BeforeEach
 	public void BeforeEach() {
 		ProcessorContext context = Mockito.mock(ProcessorContext.class);
-		Mockito.when(walletStore.get(DEPOSIT_ACCOUNT)).thenReturn(null);
-		Mockito.when(walletStore.get(EXCHANGE_ACCOUNT))
-				.thenReturn(new Wallet(EXCHANGE_ACCOUNT, Arrays.asList(new WalletEntry("BTC", BigDecimal.valueOf(1d)),
-						new WalletEntry("USD", BigDecimal.valueOf(500d)))));
-		Mockito.when(walletStore.get(WIDTHDRAW_ACCOUNT)).thenReturn(null);
 
 		Mockito.when(context.getStateStore("wallet")).thenReturn(walletStore);
 
@@ -47,6 +43,8 @@ public class WalletTransformerTest {
 
 	@Test
 	public void assertDeposit() {
+		Mockito.when(walletStore.get(DEPOSIT_ACCOUNT)).thenReturn(null);
+
 		Transaction transaction = new Transaction(UUID.randomUUID().toString(), DEPOSIT_ACCOUNT, Type.DEPOSIT, null,
 				null, BigDecimal.valueOf(1000), "USD");
 
@@ -58,6 +56,8 @@ public class WalletTransformerTest {
 
 	@Test
 	public void assertWidthdraw() {
+		Mockito.when(walletStore.get(WIDTHDRAW_ACCOUNT)).thenReturn(null);
+
 		Transaction transaction = new Transaction(UUID.randomUUID().toString(), WIDTHDRAW_ACCOUNT, Type.WIDTHDRAW,
 				BigDecimal.valueOf(1), "BTC", null, null);
 
@@ -69,6 +69,10 @@ public class WalletTransformerTest {
 
 	@Test
 	public void assertExchange() {
+		Mockito.when(walletStore.get(EXCHANGE_ACCOUNT))
+				.thenReturn(new Wallet(EXCHANGE_ACCOUNT, Arrays.asList(new WalletEntry("BTC", BigDecimal.valueOf(1d)),
+						new WalletEntry("USD", BigDecimal.valueOf(500d)))));
+
 		Transaction transaction = new Transaction(UUID.randomUUID().toString(), EXCHANGE_ACCOUNT, Type.EXCHANGE,
 				BigDecimal.valueOf(200), "USD", BigDecimal.valueOf(1), "BTC");
 
