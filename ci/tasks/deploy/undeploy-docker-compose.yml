@@ -16,7 +16,7 @@ inputs:
 - name: data-faker-version
 
 run:
-  path: ci/ci/tasks/deploy/deploy-docker-compose.sh
+  path: ci/ci/tasks/deploy/undeploy-docker-compose.sh
 
 params:
   DEPLOYMENT_NAME:

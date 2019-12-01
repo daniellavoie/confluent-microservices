@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -x
 
 SRC_FOLDER=src
 
-cd $SRC_FOLDER/$BUILD_PATH && \
-  ./mvnw -B test
+pushd $SRC_FOLDER && \
+  ./mvnw -B -f $BUILD_PATH/pom.xml test && \
+popd

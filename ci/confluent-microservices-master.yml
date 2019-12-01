@@ -202,9 +202,12 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-      KAFKA_PORT: 10001
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
-      CCLOUD_API_SECRET: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
+      SCHEMA_REGISTRY_URL: ((schema-registry.url))
+      SCHEMA_REGISTRY_KEY: ((schema-registry.key))
+      SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
   - task: "Run Rate Service Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
@@ -213,13 +216,13 @@ jobs:
     params:
       BUILD_PATH: integration-tests/exchange-rate-it
       SPRING_PROFILES_ACTIVE: ccloud
-      COINBASE_MOCK_ENABLED: false
-      CCLOUD_BOOTSTRAPSERVERS: ${CCLOUD_BOOTSTRAP_SERVERS}
-      CCLOUD_API_KEY: ${CCLOUD_API_KEY}
-      CCLOUD_API_SECRET: ${CCLOUD_API_SECRET}
-      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
-      SCHEMA_REGISTRY_KEY: $SCHEMA_REGISTRY_KEY}
-      SCHEMA_REGISTRY_SECRET: ${SCHEMA_REGISTRY_SECRET}
+      COINBASE_MOCK_ENABLED: "false"
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_API_KEY: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
+      SCHEMA_REGISTRY_URL: ((schema-registry.url))
+      SCHEMA_REGISTRY_KEY: ((schema-registry.key))
+      SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
 
 - name: Build Transaction Service
   plan:
@@ -274,9 +277,9 @@ jobs:
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
       KAFKA_PORT: 10000
-      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
-      CCLOUD_API_SECRET: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
       SCHEMA_REGISTRY_URL: ((schema-registry.url))
       SCHEMA_REGISTRY_KEY: ((schema-registry.key))
       SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
@@ -287,9 +290,9 @@ jobs:
     params:
       BUILD_PATH: integration-tests/transaction-it
       SPRING_PROFILES_ACTIVE: ccloud
-      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
-      CCLOUD_API_SECRET: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
       SCHEMA_REGISTRY_URL: ((schema-registry.url))
       SCHEMA_REGISTRY_KEY: ((schema-registry.key))
       SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
@@ -313,7 +316,7 @@ jobs:
       BUILD_PATH: wallet
   - put: docker-image-wallet
     params:
-      build: wallet-src/wallet
+      build: build
       tag_file: version/version
   - put: wallet-version
     params:
@@ -352,7 +355,7 @@ jobs:
       REGISTRY_PASSWORD: ((docker.registry.password))
       KAFKA_PORT: 10002
       CCLOUD_API_KEY: ((ccloud.api.key))
-      CCLOUD_API_SECRET: ((ccloud.api.key))
+      CCLOUD_API_SECRET: ((ccloud.api.secret))
   - task: "Run Wallet Integration Tests with Maven"
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
@@ -360,7 +363,7 @@ jobs:
     params:
       BUILD_PATH: integration-tests/wallet-it
       SPRING_PROFILES_ACTIVE: ccloud
-      CCLOUD_BOOTSTRAPSERVERS: ((ccloud.bootstrap-servers))
+      CCLOUD_BOOTSTRAP_SERVERS: ((ccloud.bootstrap-servers))
       CCLOUD_API_KEY: ((ccloud.api.key))
       CCLOUD_API_SECRET: ((ccloud.api.secret))
       WALLETIT_TOPICS_ACCOUNT_NAME: wallet-it-account
