@@ -1,7 +1,5 @@
 package io.confluent.solutions.microservices.datafaker.stream;
 
-import java.time.Duration;
-
 import org.apache.kafka.streams.processor.Processor;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import org.apache.kafka.streams.state.KeyValueStore;

@@ -6,18 +6,20 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import io.confluent.solutions.microservices.datafaker.KafkaUtil;
 import io.confluent.solutions.microservices.datafaker.domain.rate.ProductId;
 import io.confluent.solutions.microservices.datafaker.domain.transaction.Transaction.Type;
 import io.confluent.solutions.microservices.datafaker.domain.wallet.Wallet;
 import io.confluent.solutions.microservices.datafaker.domain.wallet.WalletEntry;
+import io.confluent.solutions.microservices.datafaker.topic.TransactionRequestConfiguration;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -30,17 +32,18 @@ public class TransactionServiceImpl implements TransactionService {
 	private static final BigDecimal MIN_WIDTHDRAW = BigDecimal.valueOf(5);
 	private static final BigDecimal MAX_DEPOSIT = BigDecimal.valueOf(10000);
 
-	private final String transactionRequestTopic;
+	private final TransactionRequestConfiguration topicConfiguration;
 	private final KafkaTemplate<String, Transaction> transactionTemplate;
 
 	private final Random random = new Random();
 
-	public TransactionServiceImpl(
-			@Value("${data-faker.topics.transaction-request.name:transaction-request}") String transactionRequestTopic,
+	public TransactionServiceImpl(TransactionRequestConfiguration topicConfiguration, AdminClient adminClient,
 			KafkaProperties kafkaProperties) {
-		this.transactionRequestTopic = transactionRequestTopic;
+		this.topicConfiguration = topicConfiguration;
 		this.transactionTemplate = new KafkaTemplate<>(
 				new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties()));
+
+		KafkaUtil.createTopicIfMissing(topicConfiguration, adminClient);
 	}
 
 	@Override
@@ -88,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		LOGGER.trace("Generating {}.", transaction);
 
-		return Mono.fromFuture(transactionTemplate.send(transactionRequestTopic, wallet.getAccount(), transaction)
+		return Mono.fromFuture(transactionTemplate.send(topicConfiguration.getName(), wallet.getAccount(), transaction)
 
 				.completable())
 

@@ -1,0 +1,76 @@
+---
+version: '2'
+services:
+  # connect:
+  #   image: confluentinc/cp-kafka-connect:5.3.1
+  #   container_name: microservices-dev-connect
+  #   restart: always
+  #   ports:
+  #   - "8083:8083"
+  #   depends_on:
+  #   - zookeeper
+  #   - kafka
+  #   environment:
+  #     CONNECT_BOOTSTRAP_SERVERS: "kafka:19092"
+  #     CONNECT_REST_PORT: 8083
+  #     CONNECT_LISTENERS: "http://0.0.0.0:8083"
+  #     CONNECT_GROUP_ID: "connect"
+  #     CONNECT_PRODUCER_CLIENT_ID: "connect-worker-producer"
+  #     CONNECT_CONFIG_STORAGE_TOPIC: connect-configs
+  #     CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
+  #     CONNECT_STATUS_STORAGE_TOPIC: connect-statuses
+  #     CONNECT_REPLICATION_FACTOR: 1
+  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+  #     CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+  #     CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
+  #     CONNECT_PLUGIN_PATH: "/usr/share/java,/connect-plugins"
+  #     CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+  #     CONNECT_LOG4J_LOGGERS: org.reflections=ERROR
+  #     CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-5.3.1.jar
+
+  # control-center:
+  #   image: confluentinc/cp-enterprise-control-center:5.3.1
+  #   container_name: microservices-dev-control-center
+  #   restart: always
+  #   depends_on:
+  #   - zookeeper
+  #   - kafka
+  #   - connect
+  #   ports:
+  #   - "9021:9021"
+  #   environment:
+  #     CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:19092"
+  #     CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #     CONTROL_CENTER_REPLICATION_FACTOR: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_REPLICATION: 1
+  #     CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_METRICS_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+  #     CONTROL_CENTER_METRICS_TOPIC_PARTITIONS: 1
+  #     CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
+  #     # Amount of heap to use for internal caches. Increase for better thoughput
+  #     CONTROL_CENTER_STREAMS_CACHE_MAX_BYTES_BUFFERING: 100000000
+  #     CONTROL_CENTER_CONNECT_CLUSTER: "http://connect:8083"
+  #     CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+  #     CONTROL_CENTER_DEPRECATED_VIEWS_ENABLE: "true"
+  #     CONTROL_CENTER_STREAMS_CONSUMER_REQUEST_TIMEOUT_MS: "960032"
+  #     # HTTP and HTTPS to Control Center UI 
+  #     CONTROL_CENTER_REST_LISTENERS: "http://0.0.0.0:9021"
+
+  account-db:
+    container_name: microservices-dev-account-db
+    image: postgres
+    restart: always
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_USER: account-store
+      POSTGRES_PASSWORD: account-store
+      POSTGRES_DB: account-store

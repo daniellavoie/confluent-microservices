@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties("data-faker.topics.account")
-public class AccountTopicConfiguration extends TopicConfiguration {
+@ConfigurationProperties("data-faker.topics.transaction-request")
+public class TransactionRequestConfiguration extends TopicConfiguration {
 
 }

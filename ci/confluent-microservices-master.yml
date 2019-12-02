@@ -426,20 +426,21 @@ jobs:
     passed: ["Build Data Faker"]
   - get: docker-image-wallet
     passed: ["Wallet Service Integration Tests"]
-    trigger: true
+    trigger: false
   - get: docker-image-transaction
     passed: ["Transaction Service Integration Tests"]
-    trigger: true
+    trigger: false
   - get: docker-image-rate
     passed: ["Rate Service Integration Tests"]
-    trigger: true
+    trigger: false
   - get: docker-image-ui
     passed: ["Build UI Service"]
-    trigger: true
+    trigger: false
   - get: docker-image-data-faker
     passed: ["Build Data Faker"]
-    trigger: true
+    trigger: false
   - get: src-deploy
+    trigger: true
   - task: "Deploy with docker compose"
     file: src-ci/ci/tasks/deploy/deploy-docker-compose.yml
     input_mapping:
@@ -454,7 +455,6 @@ jobs:
       REGISTRY_URL: ((docker.registry.url))
       REGISTRY_USERNAME: ((docker.registry.username))
       REGISTRY_PASSWORD: ((docker.registry.password))
-      KAFKA_PORT: 9092
 
 - name: Run Acceptance Tests
   plan:
