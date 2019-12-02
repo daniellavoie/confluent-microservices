@@ -141,6 +141,15 @@ resources:
     secret_access_key: ((s3.secret-access-key))
     region_name: ((s3.region-name))
 
+- name: src-qa-deploy
+  type: git
+  source:
+    uri: ((deployment.git.uri))
+    branch: master
+    private_key: ((deployment.git.private-key))
+    paths: 
+    - compose/qa
+
 - name: src-deploy
   type: git
   source:
@@ -184,7 +193,6 @@ jobs:
   - get: ui-version
     passed: ["Build UI Service"]
   - get: src-ci
-  - get: src-deploy
   - get: docker-image-rate
     passed: ["Build Rate Service"]
     trigger: true
@@ -212,7 +220,6 @@ jobs:
     file: src-ci/ci/tasks/maven/maven-test.yml
     input_mapping:
       src: rate-src
-      deploy: deploy-src
     params:
       BUILD_PATH: integration-tests/exchange-rate-it
       SPRING_PROFILES_ACTIVE: ccloud
@@ -248,7 +255,6 @@ jobs:
 - name: Transaction Service Integration Tests
   plan:
   - get: src-ci
-  - get: src-deploy
   - get: rate-version
     passed: ["Build Rate Service"]
   - get: transaction-version
@@ -266,7 +272,6 @@ jobs:
     file: src-ci/ci/tasks/deploy/deploy-transaction-it.yml
     input_mapping:
       ci: src-ci
-      deploy: src-deploy
     params:
       DEPLOYMENT_NAME: transaction-it
       DOCKER_SERVER: ((docker.server))
@@ -325,7 +330,6 @@ jobs:
 - name: Wallet Service Integration Tests
   plan:
   - get: src-ci
-  - get: src-deploy
   - get: rate-version
     passed: ["Build Rate Service"]
   - get: transaction-version
@@ -343,7 +347,6 @@ jobs:
     file: src-ci/ci/tasks/deploy/deploy-wallet-it.yml
     input_mapping:
       ci: src-ci
-      deploy: src-deploy
     params:
       DEPLOYMENT_NAME: wallet-it
       DOCKER_SERVER: ((docker.server))
@@ -439,13 +442,13 @@ jobs:
   - get: docker-image-data-faker
     passed: ["Build Data Faker"]
     trigger: false
-  - get: src-deploy
+  - get: src-qa-deploy
     trigger: true
   - task: "Deploy with docker compose"
     file: src-ci/ci/tasks/deploy/deploy-docker-compose.yml
     input_mapping:
       ci: src-ci
-      deploy: src-deploy
+      deploy: src-qa-deploy
     params:
       DEPLOYMENT_NAME: microservices-qa
       DOCKER_SERVER:  ((docker.server))
@@ -479,3 +482,24 @@ jobs:
   - get: docker-image-ui
     passed: ["Deploy QA Environment with Docker Compose"]
     trigger: true
+
+- name: Deploy QA Account Source Connect
+  plan:
+  - get: src-ci
+  - get: src-deploy
+  - task: Delete existing connector
+    file: src-ci/ci/tasks/connector/delete-connector.yml
+    input_mapping:
+      ci: src-ci
+    params:
+      CONNECT_URL: https://connect.qa.confluent.daniellavoie.dev
+      CONNECTOR_NAME: account-jdbc-source
+  - task: Deploy connector
+    file: src-ci/ci/tasks/connector/deploy-connector.yml
+    input_mapping:
+      ci: src-ci
+      deploy: src-deploy
+    params:
+      CONNECT_URL: https://connect.qa.confluent.daniellavoie.dev
+      CONNECTOR_NAME: account-jdbc-source
+      CONNECTOR_CONFIG_FILE: deploy/connectors/qa/account-db-source.json

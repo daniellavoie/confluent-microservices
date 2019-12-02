@@ -8,7 +8,6 @@ image_resource:
 
 inputs:
 - name: ci
-- name: deploy
 - name: wallet-version
 
 run:

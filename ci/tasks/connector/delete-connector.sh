@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -x
+
+echo "CONNECT_URL : $CONNECT_URL"
+echo "CONNECTOR_NAME : $CONNECTOR_NAME"
+
+curl -X DELETE $CONNECT_URL/connectors/$CONNECTOR_NAME
