@@ -4,6 +4,8 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: microservices-dev-zookeeper
+    ports:
+    - 2181:2181
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -30,6 +32,21 @@ services:
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  schemaregistry:
+    image: confluentinc/cp-schema-registry:5.3.1
+    container_name: microservices-dev-sr
+    restart: always
+    depends_on:
+      - zookeeper
+      - kafka
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "kafka:19092"
+      SCHEMA_REGISTRY_HOST_NAME: microservices-dev-sr
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8085"
+      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
+    ports:
+      - 8085:8085
 
   connect:
     image: confluentinc/cp-kafka-connect:5.3.1

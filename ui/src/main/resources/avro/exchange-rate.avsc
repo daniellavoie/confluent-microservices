@@ -1,0 +1,29 @@
+[
+	{
+	    "type": "record",
+	    "name": "ExchangeRate",
+	    "namespace": "io.confluent.solutions.microservices.exchangerate",
+	    "fields": [
+	    {
+	        "name": "baseCurrency",
+	        "type": "string"
+	    },
+	    {
+	        "name": "quoteCurrency",
+	        "type": "string"
+	    },
+	    {
+	        "name": "ask",
+	        "type": {"type": "bytes", "logicalType": "decimal", "precision": 24, "scale": 8}
+	    },
+	    {
+	        "name": "bid",
+	        "type": {"type": "bytes", "logicalType": "decimal", "precision": 24, "scale": 8}
+	    },
+	    {
+	        "name": "timestamp",
+	        "type": "long",
+	        "logicalType": "timestamp-millis"
+	    }]
+	}
+]
