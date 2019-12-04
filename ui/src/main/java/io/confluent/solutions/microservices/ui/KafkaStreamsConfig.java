@@ -7,16 +7,22 @@ import java.util.concurrent.ExecutionException;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.state.Stores;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import io.confluent.solutions.microservices.exchangerate.ExchangeRate;
 import io.confluent.solutions.microservices.ui.exchangerate.ExchangeRateProcessor;
-import io.confluent.solutions.microservices.ui.exchangerate.ExchangeRateStream;
+import io.confluent.solutions.microservices.ui.exchangerate.ExchangeRateReactorProcessor;
+import io.confluent.solutions.microservices.ui.store.ExchangeRateStoreConfiguration;
 import io.confluent.solutions.microservices.ui.topic.ExchangeRateConfiguration;
 import io.confluent.solutions.microservices.ui.topic.TopicConfiguration;
 
@@ -30,13 +36,28 @@ public class KafkaStreamsConfig {
 	}
 
 	@Bean
+	public SpecificAvroSerde<ExchangeRate> exchangeRateValueSerde(KafkaProperties kafkaProperties) {
+		SpecificAvroSerde<ExchangeRate> serde = new SpecificAvroSerde<ExchangeRate>();
+
+		serde.configure(kafkaProperties.buildStreamsProperties(), false);
+
+		return serde;
+	}
+
+	@Bean
 	public Topology topology(ExchangeRateProcessor exchangeRateProcessor,
-			ExchangeRateConfiguration exchangeRateConfiguration, AdminClient adminClient,
+			ExchangeRateReactorProcessor exchangeRateReactorProcessor,
+			ExchangeRateConfiguration exchangeRateConfiguration,
+			ExchangeRateStoreConfiguration exchangeRateStoreConfiguration,
+			SpecificAvroSerde<ExchangeRate> exchangeRateValueSerde, AdminClient adminClient,
 			StreamsBuilder streamsBuilder) {
 		createTopicIfMissing(exchangeRateConfiguration, adminClient);
 
-		ExchangeRateStream.exchangeRateProcessorStream(exchangeRateProcessor,
-				streamsBuilder.stream(exchangeRateConfiguration.getName()));
+		streamsBuilder.addGlobalStore(
+				Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore(exchangeRateStoreConfiguration.getName()),
+						Serdes.String(), exchangeRateValueSerde),
+				exchangeRateConfiguration.getName(), Consumed.with(Serdes.String(), exchangeRateValueSerde),
+				() -> exchangeRateReactorProcessor);
 
 		return streamsBuilder.build();
 	}
