@@ -1,7 +1,7 @@
 version : '2'
 
 services:
-  spotter:
+  service:
     image: daniellavoie/confluent-microservices-rate:${RATE_VERSION}
     restart: always
     mem_limit: 1g

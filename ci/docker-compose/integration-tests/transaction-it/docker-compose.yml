@@ -1,7 +1,7 @@
 version : '2'
 
 services:
-  transaction:
+  service:
     image: daniellavoie/confluent-microservices-transaction:${TRANSACTION_VERSION}
     restart: always
     mem_limit: 1g

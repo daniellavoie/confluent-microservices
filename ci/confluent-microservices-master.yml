@@ -230,6 +230,7 @@ jobs:
       SCHEMA_REGISTRY_URL: ((schema-registry.url))
       SCHEMA_REGISTRY_KEY: ((schema-registry.key))
       SCHEMA_REGISTRY_SECRET: ((schema-registry.secret))
+      EXCHANGERATE_TOPICS_EXCHANGERATE_NAME: it-exchange-rate
 
 - name: Build Transaction Service
   plan:
