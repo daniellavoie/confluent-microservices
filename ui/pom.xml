@@ -18,6 +18,13 @@
 	  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	  <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
+  
+  <repositories>
+    <repository>
+      <id>confluent</id>
+      <url>https://packages.confluent.io/maven/</url>
+    </repository>
+  </repositories>
 
     <build>
       <finalName>ui</finalName>
